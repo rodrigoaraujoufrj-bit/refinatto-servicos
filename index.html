@@ -91,7 +91,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações, pagamentos ou qualidade dos serviços ofertados.
+  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações ou qualidade dos serviços ofertados.
 </div>
 
 <div id="pageHome">
@@ -138,8 +138,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
             <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
         <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
-        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
-        <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
+        <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="Ex: 21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
     <div class="cad-step" id="step1">
@@ -157,7 +157,6 @@ function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
     bar.innerHTML = '<div class="cat-pill active" onclick="filterCat(this, \'\')">🏠 Todos</div>';
-    select.innerHTML = '';
     CATEGORIAS_LISTA.forEach(cat => {
         const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
         pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
@@ -170,38 +169,26 @@ async function loginGoogle() {
     await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
 }
 
-async function logout() {
-    await sb.auth.signOut();
-    window.location.reload();
-}
+async function logout() { await sb.auth.signOut(); window.location.reload(); }
 
 sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
-  const btnLogin = document.getElementById('btnLogin');
-  const userHeader = document.getElementById('userHeader');
-
-  if (currentUser) {
-    btnLogin.style.display = 'none';
-    userHeader.style.display = 'block';
-    userHeader.innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
-  } else {
-    btnLogin.style.display = 'block';
-    userHeader.style.display = 'none';
-  }
+  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
+  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
+  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  if (!currentUser || currentUser.email !== ADMIN_EMAIL) { query = query.eq('aprovado', true); }
+  if (!currentUser || currentUser.email !== ADMIN_EMAIL) query = query.eq('aprovado', true);
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
 }
 
 function renderList(list) {
-  const container = document.getElementById('plist');
-  container.innerHTML = list.map(item => `
+  document.getElementById('plist').innerHTML = list.map(item => `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
@@ -220,26 +207,18 @@ function verDetalhes(id) {
   document.getElementById('detTitle').innerText = ad.titulo;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome || 'Vizinho'}`;
   document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
-  
-  const p = document.getElementById('detPhotos');
-  p.innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
-  p.style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
+  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
+  document.getElementById('detPhotos').style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
 
-  const adminControls = document.getElementById('adminControls');
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  
-  if (isRodrigo && ad.aprovado === false) {
-      adminControls.style.display = 'block';
-      document.getElementById('btnAprovarReal').onclick = function() { aprovarAnuncio(ad.id); };
-  } else {
-      adminControls.style.display = 'none';
-  }
+  document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
+  document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
 
-  // CORREÇÃO DO WHATSAPP: Captura o número limpo e concatena com 55
-  const wppNum = ad.usuarios?.whatsapp ? ad.usuarios.whatsapp.replace(/\D/g,'') : '';
+  // BUSCA DINÂMICA DO WHATSAPP (Caso não esteja no join inicial)
+  const num = ad.usuarios?.whatsapp ? ad.usuarios.whatsapp.replace(/\D/g,'') : '';
   document.getElementById('detWppBtn').onclick = () => {
-    if (wppNum && wppNum.length >= 10) { window.open(`https://wa.me/55${wppNum}`, '_blank'); }
-    else { alert("Número de contato não disponível ou incompleto."); }
+    if (num && num.length >= 10) window.open(`https://wa.me/55${num}`, '_blank');
+    else alert("Número de contato não disponível. O usuário precisa atualizar o perfil.");
   };
   
   document.getElementById('detailOverlay').classList.add('open');
@@ -247,29 +226,15 @@ function verDetalhes(id) {
 
 async function aprovarAnuncio(id) {
     const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
-    if (!error) { 
-        alert("Anúncio aprovado com sucesso!"); 
-        closeModal('detailOverlay'); 
-        carregarAnuncios(); 
-        if (activeTab === 'myads') carregarMeusAnuncios();
-    } else {
-        alert("Erro ao aprovar: " + error.message);
-    }
+    if (!error) { alert("Anúncio aprovado!"); closeModal('detailOverlay'); carregarAnuncios(); if (activeTab === 'myads') carregarMeusAnuncios(); }
 }
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  if (data) {
-      data.forEach(ad => {
-          if (!currentData.find(item => item.id === ad.id)) currentData.push(ad);
-      });
-  }
+  if (data) data.forEach(ad => { if (!currentData.find(item => item.id === ad.id)) currentData.push(ad); });
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
-      <div style="flex:1">
-        <strong>${ad.titulo}</strong><br>
-        <span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span>
-      </div>
+      <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span></div>
       <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
   `).join('') || '<p>Você não tem anúncios.</p>';
@@ -283,22 +248,15 @@ async function deletarAnuncio(id) {
 }
 
 async function salvarTudo() {
-  const wppVal = document.getElementById('cadWpp').value;
-  if (!wppVal || wppVal.length < 10) return alert("Por favor, insira um WhatsApp válido com DDD.");
+  const wpp = document.getElementById('cadWpp').value;
+  if (!wpp || wpp.length < 10) return alert("Insira um WhatsApp válido com DDD.");
 
-  const userPayload = { 
-    id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, 
-    whatsapp: wppVal, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, 
-    apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value 
-  };
-  const adPayload = { 
-    usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, 
-    categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, 
-    fotos: itemPhotos, aprovado: false 
-  };
-  await sb.from('usuarios').upsert(userPayload);
-  const { error } = await sb.from('anuncios').insert([adPayload]);
-  if (!error) { alert("Enviado! Aguarde a moderação."); closeModal('cadOverlay'); showTab('myads'); }
+  const u = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: wpp, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value };
+  const a = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
+  
+  await sb.from('usuarios').upsert(u);
+  const { error } = await sb.from('anuncios').insert([a]);
+  if (!error) { alert("Enviado para moderação!"); closeModal('cadOverlay'); showTab('myads'); }
 }
 
 let activeTab = 'home';
@@ -319,6 +277,7 @@ function openCad() { itemPhotos = []; document.getElementById('photoGrid').inner
 function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
 function handlePhotos(input) { const files = Array.from(input.files); files.forEach(file => { const reader = new FileReader(); reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); }; reader.readAsDataURL(file); }); }
 function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div style="aspect-ratio:1; border-radius:8px; overflow:hidden;"><img src="${src}" style="width:100%; height:100%; object-fit:cover;"></div>`).join(''); }
+function filterCat(el, cat) { document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData); }
 
 window.onload = () => { setupCategorias(); carregarAnuncios(); };
 </script>
