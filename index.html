@@ -10,7 +10,6 @@
 <script>
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
   const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
-
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
   const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
@@ -19,12 +18,7 @@
   let currentData = [];
   let itemPhotos = [];
 
-  const CATEGORIAS_LISTA = [
-    "Saúde", "Beleza", "Gastronomia", "Reformas", "Automotivo", 
-    "Pets", "Aulas", "Festas", "Imóveis", "Transporte", 
-    "Desapega", "Vagas", "Doações", "Atividades", "Estética Auto", 
-    "Venda Auto", "Corretores", "Outros"
-  ];
+  const CATEGORIAS_LISTA = ["Saúde", "Beleza", "Gastronomia", "Reformas", "Automotivo", "Pets", "Aulas", "Festas", "Imóveis", "Transporte", "Desapega", "Vagas", "Doações", "Atividades", "Estética Auto", "Venda Auto", "Corretores", "Outros"];
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -39,9 +33,10 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR */
+/* TOPBAR CORRIGIDA */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
+.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:8px 16px; font-size:11px; font-weight:800; cursor:pointer; text-transform:uppercase; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
@@ -50,18 +45,21 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
+/* CARDS COM FOTO DE PERFIL E MINIATURA */
+.plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:18px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; }
+.pcard-profile-wrapper { width: 40px; height: 40px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1px solid var(--gold-light); }
+.pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
+.pcard-body { flex:1; min-width:0; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
+.pcard-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pcard-thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #eee; }
+
+/* NAV BOTTOM */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
-
-/* CARDS ATUALIZADOS */
-.plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; }
-.pcard-profile-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-light); }
-.pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
-.pcard-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
 
 /* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
@@ -70,6 +68,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
 .detail-photos img { height: 180px; border-radius: 12px; object-fit: cover; }
 
+/* CATEGORIAS */
 .cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
@@ -99,9 +98,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div id="pageHome">
-    <div class="cats" id="catBar">
-        <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
-    </div>
+    <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div></div>
     <div class="plist" id="plist"></div>
 </div>
 
@@ -118,11 +115,9 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
     <div class="detail-photos" id="detPhotos"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:20px; font-size:14px;"></p>
-    
     <div id="adminControls" style="display:none; padding:15px; background:#f0f0f0; border-radius:12px; margin-bottom:15px; border:1px solid var(--border);">
        <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
     </div>
-    
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
@@ -142,7 +137,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
             <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
         <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
-        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
         <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
@@ -160,7 +155,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
-    bar.innerHTML = '<div class="cat-pill active" onclick="filterCat(this, \'\')">🏠 Todos</div>';
     CATEGORIAS_LISTA.forEach(cat => {
         const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
         pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
@@ -185,7 +179,7 @@ sb.auth.onAuthStateChange((event, session) => {
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) { query = query.eq('aprovado', true); }
+  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) query = query.eq('aprovado', true);
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
@@ -194,17 +188,18 @@ async function carregarAnuncios() {
 function renderList(list) {
   const container = document.getElementById('plist');
   container.innerHTML = list.map(item => {
-    // Busca a 1ª foto para miniatura
     const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
-    // Busca a foto de perfil do Google do autor
-    const userPhoto = item.usuarios?.foto_url || 'https://via.placeholder.com/40';
+    // Fallback elegante se a foto do Google falhar
+    const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
 
     return `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
-      <img class="pcard-profile-img" src="${userPhoto}">
+      <div class="pcard-profile-wrapper">
+        <img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'">
+      </div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
-        <div style="font-size: 11px; color: var(--muted);">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
+        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
         ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
       </div>
       ${thumb}
@@ -216,29 +211,22 @@ function renderList(list) {
 function verDetalhes(id) {
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
-
   document.getElementById('detTitle').innerText = ad.titulo;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome || 'Vizinho'}`;
   document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
   document.getElementById('detPhotos').style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
-
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
   document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
-
-  // WHATSAPP COM SAUDAÇÃO
   const rawNum = ad.usuarios?.whatsapp || '';
   const cleanNum = rawNum.replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => {
     if (cleanNum && cleanNum.length >= 10) {
         const msg = encodeURIComponent(`Olá, vi seu anúncio "${ad.titulo}" no Refinatto Serviços e gostaria de mais informações.`);
         window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
-    } else {
-        alert("Número de contato não disponível. O usuário precisa atualizar o perfil.");
-    }
+    } else alert("WhatsApp inválido.");
   };
-  
   document.getElementById('detailOverlay').classList.add('open');
 }
 
@@ -267,7 +255,7 @@ async function deletarAnuncio(id) {
 
 async function salvarTudo() {
   const wpp = document.getElementById('cadWpp').value;
-  if (!wpp || wpp.length < 10) return alert("Insira um WhatsApp válido com DDD.");
+  if (!wpp || wpp.length < 10) return alert("WhatsApp inválido.");
   const u = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: wpp, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
   const a = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
