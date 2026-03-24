@@ -13,6 +13,7 @@
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
+  const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
   let currentUser = null;
   let tipoUsuario = 'morador';
   let currentData = [];
@@ -41,29 +42,29 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 /* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
+.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
+
+/* HERO */
+.hero { background:var(--forest); padding:32px 20px 28px; color:white; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; }
+.hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* NAV BOTTOM (CORRIGIDO: SEM OPACIDADE) */
+/* NAV BOTTOM (NÍTIDA) */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; opacity: 1 !important; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* LISTAGEM */
+/* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; transition: 0.2s; }
-.pcard:active { transform: scale(0.98); background: #f0f0f0; }
+.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; }
 .pcard-body { flex:1; min-width:0; }
 .pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:4px; }
 
-/* STATUS NO PERFIL */
-.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
-.status-pending { background: #FFF3CD; color: #856404; }
-.status-approved { background: #D4EDDA; color: #155724; }
-
-/* MODAL DETALHES */
+/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; position: relative; }
@@ -75,20 +76,24 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 
-.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-.photo-item { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; }
-.photo-item img { width: 100%; height: 100%; object-fit: cover; }
-.photo-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; }
-
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
-.btn-del { color: var(--red); font-weight: 600; background: none; border: none; cursor: pointer; font-size: 11px; }
+.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+.status-pending { background: #FFF3CD; color: #856404; }
+.status-approved { background: #D4EDDA; color: #155724; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">Refinatto<sup>serviços</sup></div>
-  <div id="userHeader" class="user-info"></div>
+  <div id="authArea">
+    <button id="btnLogin" class="btn-login-top" onclick="loginGoogle()">ENTRAR</button>
+    <div id="userHeader" class="user-info" style="display:none;"></div>
+  </div>
+</div>
+
+<div class="hero" id="heroSection">
+  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
 </div>
 
 <div class="disclaimer">
@@ -115,37 +120,40 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
     <div class="detail-photos" id="detPhotos"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:20px; font-size:14px;"></p>
+    
+    <div id="adminControls" style="display:none; margin-bottom: 10px;">
+       <button class="btn-primary" id="btnAprovar" style="background:var(--forest); color:white; margin-bottom: 10px;">Aprovar Anúncio</button>
+    </div>
+    
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
 
 <div class="nav-bottom">
-    <div class="nav-item active" id="btnNavHome" onclick="showTab('home')"><span class="nav-icon">🏠</span><span>Início</span></div>
+    <div class="nav-item active" onclick="showTab('home')"><span class="nav-icon">🏠</span><span>Início</span></div>
     <div class="nav-item" onclick="handleAnunciarClick()"><span class="nav-icon">➕</span><span>Anunciar</span></div>
-    <div class="nav-item" id="btnNavUser" onclick="showTab('myads')"><span class="nav-icon">👤</span><span>Perfil</span></div>
+    <div class="nav-item" onclick="showTab('myads')"><span class="nav-icon">👤</span><span>Perfil</span></div>
 </div>
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2 style="font-family:'Playfair Display';">Novo Anúncio</h2><button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button></div>
-    
     <div class="cad-step active" id="step0">
-      <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
-        <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
-      </div>
-      <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
-      <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
-      <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
-      <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
+            <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
+        </div>
+        <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
+        <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+        <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
-
     <div class="cad-step" id="step1">
-      <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
-      <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
-      <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
-      <div class="field"><label>Fotos (Máx 10)</label><input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;"><button class="btn-primary" style="background:white; border:1px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button><div class="photo-grid" id="photoGrid"></div></div>
-      <button class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
+        <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
+        <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
+        <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
+        <div class="field"><label>Fotos (Máx 10)</label><input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;"><button class="btn-primary" style="background:white; border:1px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button><div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;"></div></div>
+        <button class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
     </div>
   </div>
 </div>
@@ -155,28 +163,34 @@ function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
     CATEGORIAS_LISTA.forEach(cat => {
-        const pill = document.createElement('div');
-        pill.className = 'cat-pill';
-        pill.innerText = cat;
-        pill.onclick = () => filterCat(pill, cat);
-        bar.appendChild(pill);
-        const opt = document.createElement('option');
-        opt.value = cat; opt.innerText = cat;
+        const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
+        pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
+        const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat;
         select.appendChild(opt);
     });
 }
 
-async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); }
+async function loginGoogle() { 
+    await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
+}
 
 sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
+  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
+  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
   if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
-  // REGRA DE NEGÓCIO: SÓ LISTA APROVADOS NA HOME
-  const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('aprovado', true).order('criado_em', { ascending: false });
+  let query = sb.from('anuncios').select('*, usuarios(*)');
+  
+  // Se não for admin, vê só aprovados. Se for Rodrigo, vê TUDO.
+  if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+      query = query.eq('aprovado', true);
+  }
+  
+  const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
 }
@@ -188,10 +202,11 @@ function renderList(list) {
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
         <div style="font-size: 12px; color: var(--muted);">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
+        ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
       </div>
       <div style="font-size: 18px; color: var(--gold);">➔</div>
     </div>
-  `).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">Nenhum anúncio aprovado no momento.</p>';
+  `).join('');
 }
 
 function verDetalhes(id) {
@@ -202,9 +217,23 @@ function verDetalhes(id) {
   document.getElementById('detDesc').innerText = ad.descricao;
   const p = document.getElementById('detPhotos');
   p.innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
-  p.style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
+  
+  // Lógica Admin
+  const adminControls = document.getElementById('adminControls');
+  if (currentUser && currentUser.email === ADMIN_EMAIL && !ad.aprovado) {
+      adminControls.style.display = 'block';
+      document.getElementById('btnAprovar').onclick = () => aprovarAnuncio(ad.id);
+  } else {
+      adminControls.style.display = 'none';
+  }
+
   document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${ad.usuarios?.whatsapp}`);
   document.getElementById('detailOverlay').classList.add('open');
+}
+
+async function aprovarAnuncio(id) {
+    const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
+    if (!error) { alert("Anúncio aprovado!"); closeModal('detailOverlay'); carregarAnuncios(); }
 }
 
 async function carregarMeusAnuncios() {
@@ -215,44 +244,33 @@ async function carregarMeusAnuncios() {
         <strong>${ad.titulo}</strong><br>
         <span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span>
       </div>
-      <button class="btn-del" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
+      <button style="color:var(--red); border:none; background:none; font-weight:700;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
   `).join('') || '<p>Você não tem anúncios.</p>';
 }
 
-async function deletarAnuncio(id) {
-  if(confirm("Deseja excluir?")) {
-    await sb.from('anuncios').delete().eq('id', id);
-    carregarMeusAnuncios(); carregarAnuncios();
-  }
-}
-
 async function salvarTudo() {
-  if (!currentUser) return loginGoogle();
   const userPayload = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value };
   const adPayload = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
-  
-  const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
-  const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
+  await sb.from('usuarios').upsert(userPayload);
+  const { error } = await sb.from('anuncios').insert([adPayload]);
+  if (!error) { alert("Enviado! Aguarde a moderação."); closeModal('cadOverlay'); showTab('myads'); }
+}
 
-  if (!err1 && !err2) {
-    alert("Enviado com sucesso! O administrador revisará seu anúncio em breve.");
-    closeModal('cadOverlay');
-    showTab('myads');
-  } else {
-    alert("Erro ao salvar. Verifique se as colunas 'aprovado' e 'fotos' existem na tabela anuncios.");
-  }
+function showTab(tab) {
+    document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
+    document.getElementById('heroSection').style.display = tab === 'home' ? 'block' : 'none';
+    document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
+    if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
 function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad(); }
-function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
-function showTab(tab) { document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none'; document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none'; document.getElementById('btnNavHome').classList.toggle('active', tab === 'home'); document.getElementById('btnNavUser').classList.toggle('active', tab === 'myads'); if(tab === 'myads' && currentUser) carregarMeusAnuncios(); }
-function filterCat(el, cat) { document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function openCad() { itemPhotos = []; document.getElementById('photoGrid').innerHTML=''; goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
 function handlePhotos(input) { const files = Array.from(input.files); files.forEach(file => { const reader = new FileReader(); reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); }; reader.readAsDataURL(file); }); }
-function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map((src, i) => `<div class="photo-item"><img src="${src}"><button class="photo-del" onclick="itemPhotos.splice(${i}, 1); renderPhotoGrid();">✕</button></div>`).join(''); }
+function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div style="aspect-ratio:1; border-radius:8px; overflow:hidden;"><img src="${src}" style="width:100%; height:100%; object-fit:cover;"></div>`).join(''); }
 
 window.onload = () => { setupCategorias(); carregarAnuncios(); };
 </script>
