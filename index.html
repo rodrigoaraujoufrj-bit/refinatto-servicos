@@ -13,7 +13,6 @@
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
-  // E-MAIL DO ADMINISTRADOR (Certifique-se que é exatamente o e-mail do seu login Google)
   const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
   let currentUser = null;
   let tipoUsuario = 'morador';
@@ -52,7 +51,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
@@ -92,7 +91,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Administração:</strong> Novos anúncios aguardam aprovação para serem publicados na vitrine principal. O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não possui vínculo com os anunciantes e não se responsabiliza por qualquer comercialização, pagamentos ou pela qualidade dos serviços e produtos ofertados.
+  ⚠️ <strong>Administração:</strong> Novos anúncios aguardam aprovação para serem publicados na vitrine principal. O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não possui vínculo com os anunciantes e não se responsabiliza por qualquer comercialização ou qualidade.
 </div>
 
 <div id="pageHome">
@@ -116,8 +115,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <div class="detail-photos" id="detPhotos"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:20px; font-size:14px;"></p>
     
-    <div id="adminControls" style="display:none; margin-bottom: 10px;">
-       <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white; margin-bottom: 10px;">Aprovar Anúncio</button>
+    <div id="adminControls" style="display:none; padding:15px; background:#f0f0f0; border-radius:12px; margin-bottom:15px; border:1px solid var(--border);">
+       <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
     </div>
     
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
@@ -195,7 +194,6 @@ sb.auth.onAuthStateChange((event, session) => {
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
   
-  // ADMIN vê tudo. Morador vê só aprovados.
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
       query = query.eq('aprovado', true);
   }
@@ -220,49 +218,62 @@ function renderList(list) {
 }
 
 function verDetalhes(id) {
+  // Procuramos o anúncio tanto na lista geral (se carregada) quanto nos dados guardados
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
+
   document.getElementById('detTitle').innerText = ad.titulo;
-  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome}`;
-  document.getElementById('detDesc').innerText = ad.descricao;
+  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome || 'Vizinho'}`;
+  document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
+  
   const p = document.getElementById('detPhotos');
   p.innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
-  
+  p.style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
+
   const adminControls = document.getElementById('adminControls');
   const btnAprovar = document.getElementById('btnAprovarReal');
+
+  const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   
-  // CORREÇÃO: Verifica se você é o admin para mostrar o botão
-  if (currentUser && currentUser.email === ADMIN_EMAIL && ad.aprovado === false) {
+  if (isRodrigo && ad.aprovado === false) {
       adminControls.style.display = 'block';
-      btnAprovar.onclick = () => aprovarAnuncio(ad.id);
+      btnAprovar.onclick = function() { aprovarAnuncio(ad.id); };
   } else {
       adminControls.style.display = 'none';
   }
 
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${ad.usuarios?.whatsapp}`);
+  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${ad.usuarios?.whatsapp || ''}`);
   document.getElementById('detailOverlay').classList.add('open');
 }
 
 async function aprovarAnuncio(id) {
     const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
     if (!error) { 
-        alert("Anúncio aprovado!"); 
+        alert("Anúncio aprovado com sucesso!"); 
         closeModal('detailOverlay'); 
         carregarAnuncios(); 
+        if (activeTab === 'myads') carregarMeusAnuncios(); // Atualiza o perfil também
     } else {
         alert("Erro ao aprovar: " + error.message);
     }
 }
 
 async function carregarMeusAnuncios() {
-  const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
+  const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
+  // Atualizamos os dados locais para que a função verDetalhes funcione ao clicar no Perfil
+  if (data) {
+      data.forEach(ad => {
+          if (!currentData.find(item => item.id === ad.id)) currentData.push(ad);
+      });
+  }
+
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
-    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
       <div style="flex:1">
         <strong>${ad.titulo}</strong><br>
         <span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span>
       </div>
-      <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
+      <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
   `).join('') || '<p>Você não tem anúncios.</p>';
 }
@@ -285,7 +296,9 @@ async function salvarTudo() {
   if (!error) { alert("Enviado! Aguarde a moderação."); closeModal('cadOverlay'); showTab('myads'); }
 }
 
+let activeTab = 'home';
 function showTab(tab) {
+    activeTab = tab;
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('heroSection').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
