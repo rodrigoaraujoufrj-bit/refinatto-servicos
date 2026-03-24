@@ -50,7 +50,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
@@ -91,7 +91,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Administração:</strong> Novos anúncios aguardam aprovação para serem publicados na vitrine principal. O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não possui vínculo com os anunciantes e não se responsabiliza por qualquer comercialização ou qualidade.
+  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações, pagamentos ou qualidade dos serviços ofertados.
 </div>
 
 <div id="pageHome">
@@ -193,11 +193,7 @@ sb.auth.onAuthStateChange((event, session) => {
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  
-  if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-      query = query.eq('aprovado', true);
-  }
-  
+  if (!currentUser || currentUser.email !== ADMIN_EMAIL) { query = query.eq('aprovado', true); }
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
@@ -218,7 +214,6 @@ function renderList(list) {
 }
 
 function verDetalhes(id) {
-  // Procuramos o anúncio tanto na lista geral (se carregada) quanto nos dados guardados
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
 
@@ -231,28 +226,32 @@ function verDetalhes(id) {
   p.style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
 
   const adminControls = document.getElementById('adminControls');
-  const btnAprovar = document.getElementById('btnAprovarReal');
-
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   
   if (isRodrigo && ad.aprovado === false) {
       adminControls.style.display = 'block';
-      btnAprovar.onclick = function() { aprovarAnuncio(ad.id); };
+      document.getElementById('btnAprovarReal').onclick = function() { aprovarAnuncio(ad.id); };
   } else {
       adminControls.style.display = 'none';
   }
 
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${ad.usuarios?.whatsapp || ''}`);
+  // CORREÇÃO DO WHATSAPP: Captura o número do usuário dono do anúncio
+  const wppNum = ad.usuarios?.whatsapp ? ad.usuarios.whatsapp.replace(/\D/g,'') : '';
+  document.getElementById('detWppBtn').onclick = () => {
+    if (wppNum) { window.open(`https://wa.me/55${wppNum}`, '_blank'); }
+    else { alert("Número de contato não disponível."); }
+  };
+  
   document.getElementById('detailOverlay').classList.add('open');
 }
 
 async function aprovarAnuncio(id) {
     const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
     if (!error) { 
-        alert("Anúncio aprovado com sucesso!"); 
+        alert("Anúncio aprovado!"); 
         closeModal('detailOverlay'); 
         carregarAnuncios(); 
-        if (activeTab === 'myads') carregarMeusAnuncios(); // Atualiza o perfil também
+        if (activeTab === 'myads') carregarMeusAnuncios();
     } else {
         alert("Erro ao aprovar: " + error.message);
     }
@@ -260,13 +259,11 @@ async function aprovarAnuncio(id) {
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  // Atualizamos os dados locais para que a função verDetalhes funcione ao clicar no Perfil
   if (data) {
       data.forEach(ad => {
           if (!currentData.find(item => item.id === ad.id)) currentData.push(ad);
       });
   }
-
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
       <div style="flex:1">
@@ -281,16 +278,24 @@ async function carregarMeusAnuncios() {
 async function deletarAnuncio(id) {
   if(confirm("Deseja excluir permanentemente?")) {
     const { error } = await sb.from('anuncios').delete().eq('id', id);
-    if (!error) {
-        alert("Anúncio removido!");
-        carregarMeusAnuncios(); carregarAnuncios();
-    }
+    if (!error) { alert("Anúncio removido!"); carregarMeusAnuncios(); carregarAnuncios(); }
   }
 }
 
 async function salvarTudo() {
-  const userPayload = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value };
-  const adPayload = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
+  const wppVal = document.getElementById('cadWpp').value;
+  if (!wppVal) return alert("Por favor, insira seu WhatsApp.");
+
+  const userPayload = { 
+    id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, 
+    whatsapp: wppVal, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, 
+    apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value 
+  };
+  const adPayload = { 
+    usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, 
+    categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, 
+    fotos: itemPhotos, aprovado: false 
+  };
   await sb.from('usuarios').upsert(userPayload);
   const { error } = await sb.from('anuncios').insert([adPayload]);
   if (!error) { alert("Enviado! Aguarde a moderação."); closeModal('cadOverlay'); showTab('myads'); }
