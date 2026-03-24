@@ -64,13 +64,12 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* ESTILO DO BOTÃO DE DELETAR FOTO NO CADASTRO */
 .photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 .photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
 .btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
@@ -82,7 +81,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
 .cad-step { display: none; }
 .cad-step.active { display: block; }
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; }
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; }
 
 .cats { display:flex; gap:8px; overflow-x:auto; padding:10px 20px 20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
@@ -126,9 +125,12 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
     <div class="detail-photos" id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444;"></p>
+    
     <div id="adminControls" style="display:none; padding:15px; background:var(--gold-pale); border-radius:16px; margin-bottom:15px; border:1px solid var(--gold-light);">
        <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
+       <button class="btn-primary" id="btnAdminDelete" style="background:var(--red); color:white; font-size: 11px; padding: 10px;">🗑️ Excluir permanentemente</button>
     </div>
+    
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
@@ -171,7 +173,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
           <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold); margin-bottom:10px;" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
           <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div>
         </div>
-        <button class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
+        <button id="btnFinalizar" class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
     </div>
   </div>
 </div>
@@ -196,15 +198,17 @@ sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
   document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
   document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
-  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0] || "Vizinho");
+  if (currentUser) {
+    document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0] || "Vizinho");
+  }
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
+  const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   
-  // LOGICA DE ADMIN: Se o email logado for o seu, não filtra por "aprovado=true"
-  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+  if (!isRodrigo) {
       query = query.eq('aprovado', true);
   }
   
@@ -255,8 +259,16 @@ function verDetalhes(id) {
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;">`).join('');
   
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
-  document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
+  
+  // ADMIN CONTROLS: Mostra aprovar (se pendente) E excluir (sempre)
+  if (isRodrigo) {
+    document.getElementById('adminControls').style.display = 'block';
+    document.getElementById('btnAprovarReal').style.display = ad.aprovado ? 'none' : 'block';
+    document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
+    document.getElementById('btnAdminDelete').onclick = () => deletarAnuncio(ad.id, true);
+  } else {
+    document.getElementById('adminControls').style.display = 'none';
+  }
   
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${cleanNum}?text=${encodeURIComponent('Olá, vi seu anúncio no Refinatto.')}`);
@@ -270,6 +282,9 @@ async function aprovarAnuncio(id) {
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
+  // Atualiza cache local para garantir que os detalhes abram no perfil
+  if (data) data.forEach(ad => { if (!currentData.find(item => item.id === ad.id)) currentData.push(ad); });
+  
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
       <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div>
@@ -278,8 +293,13 @@ async function carregarMeusAnuncios() {
   `).join('') || '<p>Você não tem anúncios.</p>';
 }
 
-async function deletarAnuncio(id) {
-  if(confirm("Excluir?")) { await sb.from('anuncios').delete().eq('id', id); carregarMeusAnuncios(); carregarAnuncios(); }
+async function deletarAnuncio(id, fromAdmin = false) {
+  if(confirm(fromAdmin ? "ADMIN: Deseja remover este anúncio permanentemente?" : "Deseja excluir seu anúncio?")) { 
+    await sb.from('anuncios').delete().eq('id', id); 
+    closeModal('detailOverlay');
+    carregarAnuncios(); 
+    if (currentUser) carregarMeusAnuncios(); 
+  }
 }
 
 function handlePhotos(input) {
@@ -301,12 +321,38 @@ function renderPhotoGrid() {
 }
 
 async function salvarTudo() {
+  const btn = document.getElementById('btnFinalizar');
   const nome = document.getElementById('cadNome').value;
   const sobrenome = document.getElementById('cadSobrenome').value;
-  const u = { id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
+  const wpp = document.getElementById('cadWpp').value;
+  
+  if (!nome || !sobrenome || !wpp) return alert("Preencha Nome, Sobrenome e WhatsApp.");
+  
+  btn.innerText = "Enviando...";
+  btn.disabled = true;
+
+  const u = { 
+    id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: wpp, tipo: tipoUsuario, 
+    bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, 
+    apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, 
+    setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, 
+    foto_url: currentUser.user_metadata.avatar_url 
+  };
+  
+  // SEQUENCIAL para evitar duplicidade
   await sb.from('usuarios').upsert(u);
-  await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
-  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads');
+  const { error } = await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
+  
+  if(!error) {
+    alert("Anúncio enviado para aprovação!");
+    itemPhotos = [];
+    closeModal('cadOverlay');
+    showTab('myads');
+  } else {
+    alert("Erro ao salvar. Tente novamente.");
+    btn.innerText = "Enviar para Aprovação";
+    btn.disabled = false;
+  }
 }
 
 function showTab(tab) {
