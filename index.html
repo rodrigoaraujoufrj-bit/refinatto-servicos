@@ -9,11 +9,13 @@
 
 <script>
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_iNTDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
+  const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
   let currentUser = null;
-  let tipoUsuario = 'morador'; // Controle para o formulário
+  let tipoUsuario = 'morador';
+  let activeCat = '';
+  let currentData = [];
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -26,28 +28,34 @@
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366; --red: #C0392B;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 80px; border-left:1px solid var(--border); border-right:1px solid var(--border); }
+body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 90px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
 /* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 
-/* MENU INFERIOR (RESTAURADO) */
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: none; justify-content: space-around; padding: 12px 0; z-index: 100; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--muted); cursor: pointer; font-weight: 600; }
-.nav-item.active { color: var(--forest); }
+/* AVISO DE RESPONSABILIDADE */
+.disclaimer { background: var(--orange-light, #FEF3E2); border: 1px solid var(--gold-light); padding: 12px 20px; font-size: 11px; color: var(--gold); line-height: 1.4; text-align: center; }
+
+/* MENU INFERIOR FIXO */
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
+.nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 20px; margin-bottom: 4px; }
 
-/* HERO E LISTAGEM */
-.hero { background:var(--forest); padding:32px 20px 28px; color:white; }
-.hero h1 { font-family:'Playfair Display',serif; font-size:26px; }
-.hero h1 em { color:var(--gold); font-style:italic; }
+/* CATEGORIAS */
+.section { padding: 20px 20px 0; }
+.cats { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; }
+.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
+.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
+
+/* LISTAGEM */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
 .pcard-body { flex:1; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:2px; }
 
-/* MODAIS E FORMULÁRIO CONDICIONAL */
+/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:200; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; }
@@ -57,43 +65,52 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
 .field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
 
-/* BOTÕES DE OPÇÃO (MORADOR/FUNC) */
 .opt-group { display: flex; gap: 10px; margin-bottom: 20px; }
-.opt-btn { flex: 1; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+.opt-btn { flex: 1; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; }
 .opt-btn.selected { border-color: var(--forest); background: var(--forest-light); color: var(--forest); }
 
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
-.my-ad-item { border-bottom:1px solid var(--border); padding:15px 0; display:flex; justify-content:space-between; align-items:center; }
-.btn-del { color: var(--red); font-weight: 600; background: none; border: none; cursor: pointer; font-size: 12px; }
+.btn-del { color: var(--red); font-weight: 600; background: none; border: none; cursor: pointer; font-size: 11px; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">Refinatto<sup>serviços</sup></div>
-  <button id="btnLogin" class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px;" onclick="loginGoogle()">Entrar</button>
+  <button id="btnLogin" class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px; display:none;" onclick="loginGoogle()">Entrar</button>
+</div>
+
+<div class="disclaimer">
+    <strong>Atenção:</strong> O Refinatto Serviços é uma plataforma de classificados. Não nos responsabilizamos pela qualidade ou entrega dos produtos/serviços anunciados.
 </div>
 
 <div id="pageHome">
-    <div class="hero">
-        <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
+    <div class="section">
+        <div class="cats" id="catBar">
+            <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
+            <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
+            <div class="cat-pill" onclick="filterCat(this, 'Saúde')">🩺 Saúde</div>
+            <div class="cat-pill" onclick="filterCat(this, 'Serviços')">🛠️ Serviços</div>
+            <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
+        </div>
     </div>
     <div class="plist" id="plist"></div>
 </div>
 
 <div id="pageMyAds" style="display:none; padding:20px;">
-    <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Gerenciar Anúncios</h2>
+    <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Meus Anúncios</h2>
     <div id="myAdsList"></div>
+    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:30px;" onclick="sb.auth.signOut()">Sair da conta</button>
 </div>
 
-<div class="nav-bottom" id="navBottom">
-    <div class="nav-item active" onclick="showTab('home')">
+<div class="nav-bottom">
+    <div class="nav-item active" id="navHome" onclick="showTab('home')">
         <span class="nav-icon">🏠</span><span>Início</span>
     </div>
-    <div class="nav-item" onclick="openCad()">
+    <div class="nav-item" onclick="handleAnunciarClick()">
         <span class="nav-icon">➕</span><span>Anunciar</span>
     </div>
-    <div class="nav-item" onclick="showTab('myads')">
+    <div class="nav-item" id="navUser" onclick="showTab('myads')">
         <span class="nav-icon">👤</span><span>Perfil</span>
     </div>
 </div>
@@ -106,47 +123,48 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     </div>
 
     <div class="cad-step active" id="step0">
-      <label style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Você é:</label>
+      <label style="font-size:10px; font-weight:700; color:var(--muted);">VOCÊ É:</label>
       <div class="opt-group">
         <div id="optM" class="opt-btn selected" onclick="setTipo('morador')">🏠 Morador</div>
         <div id="optF" class="opt-btn" onclick="setTipo('funcionario')">👷 Funcionário</div>
       </div>
       
       <div id="fieldsMorador">
-          <div class="field"><label>Bloco</label><input type="text" id="cadBloco" placeholder="Ex: Bloco 1"></div>
-          <div class="field"><label>Apartamento</label><input type="text" id="cadApto" placeholder="Ex: 403"></div>
+          <div style="display:flex; gap:10px;">
+            <div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div>
+            <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
+          </div>
       </div>
-      
       <div id="fieldsFunc" style="display:none;">
-          <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Limpeza / Particular"></div>
+          <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div>
       </div>
 
-      <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+      <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
       <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
 
     <div class="cad-step" id="step1">
-      <div class="field"><label>Título</label><input type="text" id="cadTitulo" placeholder="Ex: Manicure e Pedicure"></div>
+      <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
       <div class="field">
           <label>Categoria</label>
           <select id="cadCat">
               <option value="Gastronomia">Gastronomia</option>
-              <option value="Serviços">Serviços</option>
               <option value="Saúde">Saúde</option>
+              <option value="Serviços">Serviços</option>
               <option value="Imóveis">Imóveis</option>
           </select>
       </div>
       <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
       <div style="display:flex; gap:10px;">
-          <button class="btn-primary" style="background:#eee;" onclick="goStep(0)">Voltar</button>
-          <button class="btn-primary" onclick="salvarTudo()">Publicar</button>
+          <button class="btn-primary" style="background:#eee; flex:1;" onclick="goStep(0)">Voltar</button>
+          <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Publicar Anúncio</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// --- LOGICA DE TIPO DE USUÁRIO ---
+// --- LOGICA DE TELA ---
 function setTipo(t) {
     tipoUsuario = t;
     document.getElementById('optM').classList.toggle('selected', t === 'morador');
@@ -155,55 +173,74 @@ function setTipo(t) {
     document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none';
 }
 
-// --- NAVEGAÇÃO DE TABS ---
 function showTab(tab) {
+    if (!currentUser && tab === 'myads') {
+        alert("Faça login para ver seu perfil.");
+        return;
+    }
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
+    document.getElementById('navHome').classList.toggle('active', tab === 'home');
+    document.getElementById('navUser').classList.toggle('active', tab === 'myads');
     if(tab === 'myads') carregarMeusAnuncios();
 }
 
-// --- SUPABASE AUTH ---
-async function loginGoogle() {
-  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+function handleAnunciarClick() {
+    if (!currentUser) { loginGoogle(); } else { openCad(); }
 }
 
+// --- SUPABASE & AUTH ---
+async function loginGoogle() {
+    await sb.auth.signInWithOAuth({ 
+        provider: 'google', 
+        options: { redirectTo: window.location.origin + window.location.pathname } 
+    });
+}
+
+// VERIFICAÇÃO DE SESSÃO PERSISTENTE
 sb.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    currentUser = session.user;
-    document.getElementById('btnLogin').style.display = 'none';
-    document.getElementById('navBottom').style.display = 'flex';
+    currentUser = session?.user || null;
+    if (currentUser) {
+        document.getElementById('btnLogin').style.display = 'none';
+        console.log("Logado como:", currentUser.email);
+    } else {
+        document.getElementById('btnLogin').style.display = 'block';
+    }
     carregarAnuncios();
-  }
 });
 
-// --- OPERAÇÕES DE BANCO ---
+// --- DADOS ---
 async function carregarAnuncios() {
-  const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
-  const container = document.getElementById('plist');
-  container.innerHTML = data.map(item => `
-    <div class="pcard">
-      <div class="pcard-body">
-        <div class="pcard-name">${item.titulo}</div>
-        <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
-      </div>
-      <button class="btn-primary" style="width:auto; background:var(--wpp); color:white; border-radius:8px; padding:8px;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
-    </div>
-  `).join('');
+    const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
+    currentData = data || [];
+    renderList(currentData);
+}
+
+function renderList(list) {
+    const container = document.getElementById('plist');
+    container.innerHTML = list.map(item => `
+        <div class="pcard">
+            <div class="pcard-body">
+                <div class="pcard-name">${item.titulo}</div>
+                <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
+            </div>
+            <button class="btn-primary" style="width:auto; background:var(--wpp); padding:8px 12px;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
+        </div>
+    `).join('') || '<p style="text-align:center; color:var(--muted); padding:20px;">Nenhum anúncio encontrado.</p>';
 }
 
 async function carregarMeusAnuncios() {
     const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id);
-    const container = document.getElementById('myAdsList');
-    container.innerHTML = data.map(ad => `
+    document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
         <div class="my-ad-item">
             <div><strong>${ad.titulo}</strong><br><small>${ad.categoria}</small></div>
             <button class="btn-del" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
         </div>
-    `).join('') || '<p>Você não tem anúncios.</p>';
+    `).join('') || '<p>Você não tem anúncios ativos.</p>';
 }
 
 async function deletarAnuncio(id) {
-    if(confirm("Deseja excluir este anúncio?")) {
+    if(confirm("Deseja excluir permanentemente?")) {
         await sb.from('anuncios').delete().eq('id', id);
         carregarMeusAnuncios();
         carregarAnuncios();
@@ -211,16 +248,13 @@ async function deletarAnuncio(id) {
 }
 
 async function salvarTudo() {
-    const nome = currentUser.user_metadata.full_name;
-    const email = currentUser.email;
-    const whatsapp = document.getElementById('cadWpp').value;
+    if(!currentUser) return loginGoogle();
     
-    // Payload do Usuário respeitando o tipo
     const userPayload = { 
         id: currentUser.id, 
-        email, 
-        nome, 
-        whatsapp,
+        email: currentUser.email, 
+        nome: currentUser.user_metadata.full_name,
+        whatsapp: document.getElementById('cadWpp').value,
         tipo: tipoUsuario,
         bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null,
         apto: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null,
@@ -234,20 +268,33 @@ async function salvarTudo() {
         descricao: document.getElementById('cadDesc').value
     };
 
-    await sb.from('usuarios').upsert(userPayload);
-    await sb.from('anuncios').insert([adPayload]);
+    const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
+    const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
 
-    alert("Publicado!");
-    closeModal('cadOverlay');
-    carregarAnuncios();
+    if (!err1 && !err2) {
+        alert("Publicado!");
+        closeModal('cadOverlay');
+        carregarAnuncios();
+    } else {
+        alert("Erro ao salvar. Verifique o banco.");
+    }
 }
 
-// --- UTILITÁRIOS UI ---
+// --- UI HELPERS ---
+function filterCat(el, cat) {
+    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCat = cat;
+    const filtered = activeCat ? currentData.filter(i => i.categoria === activeCat) : currentData;
+    renderList(filtered);
+}
+
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 window.onload = carregarAnuncios;
 </script>
+
 </body>
 </html>
