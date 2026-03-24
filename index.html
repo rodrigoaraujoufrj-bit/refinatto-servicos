@@ -50,8 +50,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
@@ -104,7 +104,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageMyAds" style="display:none; padding:20px;">
     <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Meus Anúncios</h2>
     <div id="myAdsList" style="display:flex; flex-direction:column; gap:12px;"></div>
-    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="sb.auth.signOut(); location.reload();">Sair da Conta</button>
+    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="logout()">Sair da Conta</button>
 </div>
 
 <div class="overlay" id="detailOverlay">
@@ -156,6 +156,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
+    bar.innerHTML = '<div class="cat-pill active" onclick="filterCat(this, \'\')">🏠 Todos</div>';
+    select.innerHTML = '';
     CATEGORIAS_LISTA.forEach(cat => {
         const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
         pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
@@ -166,6 +168,11 @@ function setupCategorias() {
 
 async function loginGoogle() { 
     await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
+}
+
+async function logout() {
+    await sb.auth.signOut();
+    window.location.reload();
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -222,7 +229,7 @@ function verDetalhes(id) {
   
   if (currentUser && currentUser.email === ADMIN_EMAIL && !ad.aprovado) {
       adminControls.style.display = 'block';
-      btnAprovar.onclick = () => aprovarAnuncio(ad.id); // Vinculando a função aqui
+      btnAprovar.onclick = () => aprovarAnuncio(ad.id);
   } else {
       adminControls.style.display = 'none';
   }
@@ -244,15 +251,29 @@ async function aprovarAnuncio(id) {
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
+  const listContainer = document.getElementById('myAdsList');
+  listContainer.innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <div style="flex:1">
         <strong>${ad.titulo}</strong><br>
         <span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span>
       </div>
-      <button style="color:var(--red); border:none; background:none; font-weight:700;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
+      <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
   `).join('') || '<p>Você não tem anúncios.</p>';
+}
+
+async function deletarAnuncio(id) {
+  if(confirm("Deseja excluir permanentemente?")) {
+    const { error } = await sb.from('anuncios').delete().eq('id', id);
+    if (!error) {
+        alert("Anúncio removido com sucesso!");
+        carregarMeusAnuncios(); 
+        carregarAnuncios();
+    } else {
+        alert("Erro ao excluir: " + error.message);
+    }
+  }
 }
 
 async function salvarTudo() {
