@@ -112,13 +112,19 @@
 let currentData = [];
 let activeCat = '';
 
-// 1. LOGIN COM GOOGLE
+// 1. LOGIN COM GOOGLE (Atualizado para Produção)
 async function loginGoogle() {
     const { error } = await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href }
+        options: { 
+            // Forçamos o retorno exatamente para o seu domínio no Vercel
+            redirectTo: 'https://refinatto-servicos.vercel.app' 
+        }
     });
-    if (error) console.error("Erro no login:", error.message);
+    if (error) {
+        console.error("Erro no login:", error.message);
+        alert("Erro ao conectar com Google: " + error.message);
+    }
 }
 
 // 2. MONITORAR ESTADO DE LOGIN
