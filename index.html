@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refinatto — Serviços & Anúncios</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      // 2. CONFIGURAÇÃO (Troque pela sua chave do painel API)
+      const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
+      const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL'
+
+      // 3. INICIALIZAÇÃO DO CLIENTE
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+      
+      let currentUser = null;
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
+            --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
+            --forest: #1E3A2F; --forest-mid: #2E5943; --forest-light: #D4E8DC;
+            --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; }
+
+        /* TOPBAR */
+        .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; }
+        .brand { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--gold); }
+        .btn-offer { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; }
+        .btn-login { background:transparent; border:1px solid var(--gold); color:var(--gold); margin-right: 5px; }
+
+        /* HERO & SEARCH */
+        .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
+        .hero h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:18px; }
+        .hero h1 em { color:var(--gold); font-style:italic; }
+        .search-wrap { display:flex; background:white; border-radius:12px; overflow:hidden; }
+        .search-wrap input { flex:1; border:none; padding:13px 16px; outline:none; }
+        .search-wrap button { background:var(--gold); border:none; padding:0 18px; }
+
+        /* STATS */
+        .stats-bar { display:flex; background:var(--gold-pale); border-bottom:1px solid var(--gold-light); padding:10px 20px; text-align:center; }
+        .stat { flex:1; }
+        .stat-num { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); }
+        .stat-label { font-size:10px; color:var(--muted); }
+
+        /* CATEGORIES */
+        .section { padding:24px 20px 10px; }
+        .sec-title { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:12px; display:block; }
+        .cats { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; }
+        .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
+        .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
+
+        /* CARDS */
+        .plist { padding:0 20px 100px; display:flex; flex-direction:column; gap:12px; }
+        .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
+        .pcard-avatar { width:48px; height:48px; background:#eee; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+        .pcard-body { flex:1; }
+        .pcard-name { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; }
+        .pcard-svc { font-size:12px; color:var(--muted); margin-bottom:4px; }
+        .pill { font-size:10px; padding:2px 8px; border-radius:100px; background:var(--gold-pale); color:var(--gold); font-weight:600; }
+        .btn-wpp { width:36px; height:36px; background:var(--wpp); color:white; border-radius:10px; border:none; display:flex; align-items:center; justify-content:center; text-decoration:none; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">Refinatto<sup>serviços</sup></div>
+    <div id="authArea">
+        <button id="btnLogin" class="btn-offer btn-login" onclick="loginGoogle()">Entrar</button>
+        <button id="btnAnunciar" class="btn-offer" style="display:none" onclick="alert('Formulário em breve!')">+ Anunciar</button>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
+    <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="O que você procura?" oninput="applyFilters()">
+        <button>🔍</button>
+    </div>
+</div>
+
+<div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Anúncios</div></div>
+    <div class="stat"><div class="stat-num">18</div><div class="stat-label">Categorias</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Gratuito</div></div>
+</div>
+
+<div class="section">
+    <span class="sec-title">Categorias</span>
+    <div class="cats" id="catList">
+        <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
+        <div class="cat-pill" onclick="filterCat(this, 'saúde')">🩺 Saúde</div>
+        <div class="cat-pill" onclick="filterCat(this, 'gastronomia')">🍕 Gastronomia</div>
+        <div class="cat-pill" onclick="filterCat(this, 'beleza')">✂️ Beleza</div>
+        <div class="cat-pill" onclick="filterCat(this, 'imóveis')">🔑 Imóveis</div>
+    </div>
+</div>
+
+<div class="section">
+    <span class="sec-title">Recentes</span>
+    <div class="plist" id="plist">
+        </div>
+</div>
+
+<script>
+let currentData = [];
+let activeCat = '';
+
+// 1. LOGIN COM GOOGLE
+async function loginGoogle() {
+    const { error } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+    });
+    if (error) console.error("Erro no login:", error.message);
+}
+
+// 2. MONITORAR ESTADO DE LOGIN
+sb.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        currentUser = session.user;
+        document.getElementById('btnLogin').style.display = 'none';
+        document.getElementById('btnAnunciar').style.display = 'block';
+        console.log("Usuário logado:", currentUser.email);
+    } else {
+        currentUser = null;
+        document.getElementById('btnLogin').style.display = 'block';
+        document.getElementById('btnAnunciar').style.display = 'none';
+    }
+});
+
+// 3. CARREGAR ANÚNCIOS REAIS
+async function carregarAnuncios() {
+    const { data, error } = await sb
+        .from('anuncios')
+        .select('*')
+        .order('criado_em', { ascending: false });
+
+    if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+    }
+    currentData = data;
+    renderList(data);
+}
+
+// 4. RENDERIZAR INTERFACE
+function renderList(list) {
+    const container = document.getElementById('plist');
+    container.innerHTML = '';
+    document.getElementById('totalCount').textContent = list.length;
+
+    if (list.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:var(--muted); padding:20px;">Nenhum anúncio encontrado.</p>';
+        return;
+    }
+
+    list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'pcard';
+        card.innerHTML = `
+            <div class="pcard-avatar">👤</div>
+            <div class="pcard-body">
+                <div class="pcard-name">${item.titulo}</div>
+                <div class="pcard-svc">${item.categoria}</div>
+                <div class="pill">${item.localizacao_bloco || 'Refinatto'}</div>
+            </div>
+            <div class="pcard-side">
+                <a href="https://wa.me/55${item.whatsapp?.replace(/\D/g,'') || ''}" target="_blank" class="btn-wpp">💬</a>
+            </div>
+        `;
+        container.append(card);
+    });
+}
+
+// 5. FILTROS E BUSCA
+function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = currentData;
+    
+    if (activeCat) {
+        filtered = filtered.filter(item => item.categoria.toLowerCase() === activeCat.toLowerCase());
+    }
+    if (q) {
+        filtered = filtered.filter(item => 
+            item.titulo.toLowerCase().includes(q) || 
+            item.categoria.toLowerCase().includes(q)
+        );
+    }
+    renderList(filtered);
+}
+
+function filterCat(el, cat) {
+    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCat = cat;
+    applyFilters();
+}
+
+// INICIALIZAR
+window.onload = carregarAnuncios;
+</script>
+
+</body>
+</html>
