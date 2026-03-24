@@ -17,8 +17,28 @@
   let tipoUsuario = 'morador';
   let currentData = [];
   let itemPhotos = [];
+  let activeCat = ''; // Categoria selecionada no momento
 
-  const CATEGORIAS_LISTA = ["Saúde", "Beleza", "Gastronomia", "Reformas", "Automotivo", "Pets", "Aulas", "Festas", "Imóveis", "Transporte", "Desapega", "Vagas", "Doações", "Atividades", "Estética Auto", "Venda Auto", "Corretores", "Outros"];
+  const CATEGORIAS_LISTA = [
+    { nome: "Saúde", emoji: "🩺" },
+    { nome: "Beleza", emoji: "✂️" },
+    { nome: "Gastronomia", emoji: "🍽️" },
+    { nome: "Reformas", emoji: "🏗️" },
+    { nome: "Automotivo", emoji: "🔧" },
+    { nome: "Pets", emoji: "🐾" },
+    { nome: "Aulas", emoji: "📚" },
+    { nome: "Festas", emoji: "🎈" },
+    { nome: "Imóveis", emoji: "🔑" },
+    { nome: "Transporte", emoji: "🚕" },
+    { nome: "Desapega", emoji: "🏷️" },
+    { nome: "Vagas", emoji: "🅿️" },
+    { nome: "Doações", emoji: "🤝" },
+    { nome: "Atividades", emoji: "🏃" },
+    { nome: "Estética Auto", emoji: "🚿" },
+    { nome: "Venda Auto", emoji: "🚘" },
+    { nome: "Corretores", emoji: "🏢" },
+    { nome: "Outros", emoji: "⭐" }
+  ];
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -39,13 +59,18 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
-.hero { background:var(--forest); padding:32px 20px 28px; color:white; }
-.hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; }
+.hero { background:var(--forest); padding:32px 20px 20px; color:white; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
 .hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
+
+/* BARRA DE PESQUISA */
+.search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
+.search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.search-box input { flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px; color: var(--ink); }
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* CARDS LISTA */
+/* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
 .pcard:active { transform: scale(0.98); }
@@ -58,11 +83,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 /* NAV BOTTOM */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* MODAIS E FORMULÁRIO */
+/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
@@ -73,10 +98,10 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .cad-step.active { display: block; }
 
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; }
-.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
+.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
 .detail-photos img { height: 180px; border-radius: 16px; object-fit: cover; }
 
-.cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
+.cats { display:flex; gap:8px; overflow-x:auto; padding:10px 20px 20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 
@@ -99,10 +124,19 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   <div class="hero" id="heroSection">
     <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
   </div>
+  
+  <div class="search-container">
+    <div class="search-box">
+      <span style="margin-right:10px; opacity:0.5;">🔍</span>
+      <input type="text" id="searchInput" placeholder="O que você está procurando?" oninput="filterData()">
+    </div>
+  </div>
+
   <div class="disclaimer">
     ⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos. A plataforma não se responsabiliza pelas negociações.
   </div>
-  <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div></div>
+  
+  <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterByCat(this, '')">🏠 Todos</div></div>
   <div class="plist" id="plist"></div>
 </div>
 
@@ -135,7 +169,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2 style="font-family:'Playfair Display';">Novo Anúncio</h2><button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button></div>
-    
     <div class="cad-step active" id="step0">
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
@@ -149,10 +182,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
           <div style="display:flex; gap:10px;">
             <div class="field" style="flex:1;"><label>Bloco</label>
               <select id="cadBloco">
-                <option value="1">Bloco 1</option>
-                <option value="2">Bloco 2</option>
-                <option value="3">Bloco 3</option>
-                <option value="4">Bloco 4</option>
+                <option value="1">Bloco 1</option><option value="2">Bloco 2</option><option value="3">Bloco 3</option><option value="4">Bloco 4</option>
               </select>
             </div>
             <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
@@ -162,9 +192,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
-
     <div class="cad-step" id="step1">
-        <div class="field"><label>Título do que está anunciando</label><input type="text" id="cadTitulo"></div>
+        <div class="field"><label>Título do anúncio</label><input type="text" id="cadTitulo"></div>
         <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
         <div class="field"><label>Descrição Detalhada</label><textarea id="cadDesc" rows="3"></textarea></div>
         <div class="field"><label>Fotos (Máx 10)</label>
@@ -184,18 +213,19 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
+    bar.innerHTML = '<div class="cat-pill active" onclick="filterByCat(this, \'\')">🏠 Todos</div>';
     CATEGORIAS_LISTA.forEach(cat => {
-        const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
-        pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
-        const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat;
+        const pill = document.createElement('div'); pill.className = 'cat-pill';
+        pill.innerText = `${cat.emoji} ${cat.nome}`;
+        pill.onclick = () => filterByCat(pill, cat.nome);
+        bar.appendChild(pill);
+        const opt = document.createElement('option'); opt.value = cat.nome;
+        opt.innerText = `${cat.emoji} ${cat.nome}`;
         select.appendChild(opt);
     });
 }
 
-async function loginGoogle() { 
-    await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
-}
-
+async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); }
 async function logout() { await sb.auth.signOut(); window.location.reload(); }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -211,14 +241,36 @@ async function carregarAnuncios() {
   if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) query = query.eq('aprovado', true);
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
-  renderList(currentData);
+  filterData(); // Renderiza a lista inicial
+}
+
+// LOGICA COMBINADA DE FILTRO (CATEGORIA + PESQUISA)
+function filterByCat(el, catNome) {
+    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCat = catNome;
+    filterData();
+}
+
+function filterData() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = currentData;
+    
+    if (activeCat) filtered = filtered.filter(i => i.categoria === activeCat);
+    if (term) {
+        filtered = filtered.filter(i => 
+            i.titulo.toLowerCase().includes(term) || 
+            i.descricao.toLowerCase().includes(term) ||
+            i.usuarios?.nome.toLowerCase().includes(term)
+        );
+    }
+    renderList(filtered);
 }
 
 function renderList(list) {
   const container = document.getElementById('plist');
   container.innerHTML = list.map(item => {
     const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
-    // PRIORIZA FOTO DO GOOGLE, CASO NÃO TENHA, USA INICIAIS
     const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
     const loc = item.usuarios?.tipo === 'morador' ? `Bloco ${item.usuarios.bloco} • Apto ${item.usuarios.apartamento}` : item.usuarios?.setor;
 
@@ -235,7 +287,7 @@ function renderList(list) {
       ${thumb}
       <div style="font-size: 16px; color: var(--gold); margin-left: 4px;">➔</div>
     </div>
-  `}).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">Nenhum anúncio disponível.</p>';
+  `}).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">Nenhum anúncio encontrado.</p>';
 }
 
 function verDetalhes(id) {
@@ -250,11 +302,10 @@ function verDetalhes(id) {
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
   document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
-  const rawNum = ad.usuarios?.whatsapp || '';
-  const cleanNum = rawNum.replace(/\D/g,'');
+  const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => {
-    if (cleanNum && cleanNum.length >= 10) {
-        const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto e gostaria de mais informações.`);
+    if (cleanNum.length >= 10) {
+        const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto.`);
         window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
     } else alert("WhatsApp inválido.");
   };
@@ -268,7 +319,6 @@ async function aprovarAnuncio(id) {
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  if (data) data.forEach(ad => { if (!currentData.find(item => item.id === ad.id)) currentData.push(ad); });
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
       <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span></div>
@@ -278,9 +328,9 @@ async function carregarMeusAnuncios() {
 }
 
 async function deletarAnuncio(id) {
-  if(confirm("Deseja excluir permanentemente?")) {
+  if(confirm("Deseja excluir?")) {
     const { error } = await sb.from('anuncios').delete().eq('id', id);
-    if (!error) { alert("Anúncio removido!"); carregarMeusAnuncios(); carregarAnuncios(); }
+    if (!error) { carregarMeusAnuncios(); carregarAnuncios(); }
   }
 }
 
@@ -288,14 +338,10 @@ async function salvarTudo() {
   const nome = document.getElementById('cadNome').value;
   const sobrenome = document.getElementById('cadSobrenome').value;
   const wpp = document.getElementById('cadWpp').value;
-  if (!nome || !sobrenome || !wpp) return alert("Por favor, preencha Nome, Sobrenome e WhatsApp.");
+  if (!nome || !sobrenome || wpp.length < 10) return alert("Preencha nome completo e WhatsApp válido.");
 
   const u = { 
-    id: currentUser.id, 
-    email: currentUser.email, 
-    nome: `${nome} ${sobrenome}`, 
-    whatsapp: wpp, 
-    tipo: tipoUsuario, 
+    id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: wpp, tipo: tipoUsuario, 
     bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, 
     apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, 
     setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, 
@@ -330,7 +376,6 @@ function setTipo(t) {
 }
 function handlePhotos(input) { const files = Array.from(input.files); files.forEach(file => { const reader = new FileReader(); reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); }; reader.readAsDataURL(file); }); }
 function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div style="aspect-ratio:1; border-radius:8px; overflow:hidden;"><img src="${src}" style="width:100%; height:100%; object-fit:cover;"></div>`).join(''); }
-function filterCat(el, cat) { document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData); }
 
 window.onload = () => { setupCategorias(); carregarAnuncios(); };
 </script>
