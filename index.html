@@ -17,27 +17,15 @@
   let tipoUsuario = 'morador';
   let currentData = [];
   let itemPhotos = [];
-  let activeCat = ''; // Categoria selecionada no momento
+  let activeCat = '';
 
   const CATEGORIAS_LISTA = [
-    { nome: "Saúde", emoji: "🩺" },
-    { nome: "Beleza", emoji: "✂️" },
-    { nome: "Gastronomia", emoji: "🍽️" },
-    { nome: "Reformas", emoji: "🏗️" },
-    { nome: "Automotivo", emoji: "🔧" },
-    { nome: "Pets", emoji: "🐾" },
-    { nome: "Aulas", emoji: "📚" },
-    { nome: "Festas", emoji: "🎈" },
-    { nome: "Imóveis", emoji: "🔑" },
-    { nome: "Transporte", emoji: "🚕" },
-    { nome: "Desapega", emoji: "🏷️" },
-    { nome: "Vagas", emoji: "🅿️" },
-    { nome: "Doações", emoji: "🤝" },
-    { nome: "Atividades", emoji: "🏃" },
-    { nome: "Estética Auto", emoji: "🚿" },
-    { nome: "Venda Auto", emoji: "🚘" },
-    { nome: "Corretores", emoji: "🏢" },
-    { nome: "Outros", emoji: "⭐" }
+    { nome: "Saúde", emoji: "🩺" }, { nome: "Beleza", emoji: "✂️" }, { nome: "Gastronomia", emoji: "🍽️" },
+    { nome: "Reformas", emoji: "🏗️" }, { nome: "Automotivo", emoji: "🔧" }, { nome: "Pets", emoji: "🐾" },
+    { nome: "Aulas", emoji: "📚" }, { nome: "Festas", emoji: "🎈" }, { nome: "Imóveis", emoji: "🔑" },
+    { nome: "Transporte", emoji: "🚕" }, { nome: "Desapega", emoji: "🏷️" }, { nome: "Vagas", emoji: "🅿️" },
+    { nome: "Doações", emoji: "🤝" }, { nome: "Atividades", emoji: "🏃" }, { nome: "Estética Auto", emoji: "🚿" },
+    { nome: "Venda Auto", emoji: "🚘" }, { nome: "Corretores", emoji: "🏢" }, { nome: "Outros", emoji: "⭐" }
   ];
 </script>
 
@@ -63,7 +51,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
 .hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
-/* BARRA DE PESQUISA */
 .search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 .search-box input { flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px; color: var(--ink); }
@@ -73,7 +60,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 /* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
-.pcard:active { transform: scale(0.98); }
 .pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
 .pcard-body { flex:1; min-width:0; }
@@ -81,13 +67,18 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .pcard-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
+/* FOTOS NO CADASTRO COM DELETE */
+.photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
+.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
 /* NAV BOTTOM */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* MODAIS */
+/* FORM */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
@@ -96,10 +87,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
 .cad-step { display: none; }
 .cad-step.active { display: block; }
-
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; }
-.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
-.detail-photos img { height: 180px; border-radius: 16px; object-fit: cover; }
 
 .cats { display:flex; gap:8px; overflow-x:auto; padding:10px 20px 20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
@@ -128,7 +116,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   <div class="search-container">
     <div class="search-box">
       <span style="margin-right:10px; opacity:0.5;">🔍</span>
-      <input type="text" id="searchInput" placeholder="O que você está procurando?" oninput="filterData()">
+      <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()">
     </div>
   </div>
 
@@ -151,12 +139,12 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <button style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px;" onclick="closeModal('detailOverlay')">✕</button>
     <h2 id="detTitle" style="font-family:'Playfair Display', serif; margin-bottom:10px;"></h2>
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
-    <div class="detail-photos" id="detPhotos"></div>
+    <div class="detail-photos" id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444;"></p>
     <div id="adminControls" style="display:none; padding:15px; background:var(--gold-pale); border-radius:16px; margin-bottom:15px; border:1px solid var(--gold-light);">
        <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
     </div>
-    <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white; display:flex; align-items:center; justify-content:center; gap:8px;">💬 Chamar no WhatsApp</button>
+    <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
 
@@ -169,6 +157,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2 style="font-family:'Playfair Display';">Novo Anúncio</h2><button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button></div>
+    
     <div class="cad-step active" id="step0">
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
@@ -180,11 +169,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         </div>
         <div id="fieldsMorador">
           <div style="display:flex; gap:10px;">
-            <div class="field" style="flex:1;"><label>Bloco</label>
-              <select id="cadBloco">
-                <option value="1">Bloco 1</option><option value="2">Bloco 2</option><option value="3">Bloco 3</option><option value="4">Bloco 4</option>
-              </select>
-            </div>
+            <div class="field" style="flex:1;"><label>Bloco</label><select id="cadBloco"><option value="1">Bloco 1</option><option value="2">Bloco 2</option><option value="3">Bloco 3</option><option value="4">Bloco 4</option></select></div>
             <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
           </div>
         </div>
@@ -192,18 +177,20 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
+
     <div class="cad-step" id="step1">
         <div class="field"><label>Título do anúncio</label><input type="text" id="cadTitulo"></div>
         <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
         <div class="field"><label>Descrição Detalhada</label><textarea id="cadDesc" rows="3"></textarea></div>
-        <div class="field"><label>Fotos (Máx 10)</label>
+        <div class="field">
+          <label>Fotos (Máx 10)</label>
           <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;">
-          <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
-          <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;"></div>
+          <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold); margin-bottom:10px;" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
+          <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div>
         </div>
         <div style="display:flex; gap:10px;">
           <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1;" onclick="goStep(0)">Voltar</button>
-          <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Enviar para Aprovação</button>
+          <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Publicar</button>
         </div>
     </div>
   </div>
@@ -215,12 +202,9 @@ function setupCategorias() {
     const select = document.getElementById('cadCat');
     bar.innerHTML = '<div class="cat-pill active" onclick="filterByCat(this, \'\')">🏠 Todos</div>';
     CATEGORIAS_LISTA.forEach(cat => {
-        const pill = document.createElement('div'); pill.className = 'cat-pill';
-        pill.innerText = `${cat.emoji} ${cat.nome}`;
-        pill.onclick = () => filterByCat(pill, cat.nome);
-        bar.appendChild(pill);
-        const opt = document.createElement('option'); opt.value = cat.nome;
-        opt.innerText = `${cat.emoji} ${cat.nome}`;
+        const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = `${cat.emoji} ${cat.nome}`;
+        pill.onclick = () => filterByCat(pill, cat.nome); bar.appendChild(pill);
+        const opt = document.createElement('option'); opt.value = cat.nome; opt.innerText = `${cat.emoji} ${cat.nome}`;
         select.appendChild(opt);
     });
 }
@@ -232,19 +216,21 @@ sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
   document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
   document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
-  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
+  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0] || "Vizinho");
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) query = query.eq('aprovado', true);
-  const { data } = await query.order('criado_em', { ascending: false });
+  // Se não for admin, vê só aprovados. Se for Rodrigo, vê TUDO para aprovar.
+  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      query = query.eq('aprovado', true);
+  }
+  const { data, error } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
-  filterData(); // Renderiza a lista inicial
+  filterData();
 }
 
-// LOGICA COMBINADA DE FILTRO (CATEGORIA + PESQUISA)
 function filterByCat(el, catNome) {
     document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
@@ -255,13 +241,11 @@ function filterByCat(el, catNome) {
 function filterData() {
     const term = document.getElementById('searchInput').value.toLowerCase();
     let filtered = currentData;
-    
     if (activeCat) filtered = filtered.filter(i => i.categoria === activeCat);
     if (term) {
         filtered = filtered.filter(i => 
             i.titulo.toLowerCase().includes(term) || 
-            i.descricao.toLowerCase().includes(term) ||
-            i.usuarios?.nome.toLowerCase().includes(term)
+            (i.usuarios?.nome && i.usuarios.nome.toLowerCase().includes(term))
         );
     }
     renderList(filtered);
@@ -276,9 +260,7 @@ function renderList(list) {
 
     return `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
-      <div class="pcard-profile-wrapper">
-        <img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'">
-      </div>
+      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'"></div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
         <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc || ''}</div>
@@ -287,7 +269,7 @@ function renderList(list) {
       ${thumb}
       <div style="font-size: 16px; color: var(--gold); margin-left: 4px;">➔</div>
     </div>
-  `}).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">Nenhum anúncio encontrado.</p>';
+  `}).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">Nenhum anúncio encontrado.</p>';
 }
 
 function verDetalhes(id) {
@@ -297,65 +279,74 @@ function verDetalhes(id) {
   const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
   document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
-  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
-  document.getElementById('detPhotos').style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
+  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;">`).join('');
+  
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
   document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
+  
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => {
-    if (cleanNum.length >= 10) {
-        const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto.`);
-        window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
-    } else alert("WhatsApp inválido.");
+    const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto.`);
+    window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
   };
   document.getElementById('detailOverlay').classList.add('open');
 }
 
 async function aprovarAnuncio(id) {
-    const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
-    if (!error) { alert("Anúncio aprovado!"); closeModal('detailOverlay'); carregarAnuncios(); if (activeTab === 'myads') carregarMeusAnuncios(); }
+    await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
+    alert("Aprovado!"); closeModal('detailOverlay'); carregarAnuncios();
 }
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
-      <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span></div>
+      <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div>
       <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
   `).join('') || '<p>Você não tem anúncios.</p>';
 }
 
 async function deletarAnuncio(id) {
-  if(confirm("Deseja excluir?")) {
-    const { error } = await sb.from('anuncios').delete().eq('id', id);
-    if (!error) { carregarMeusAnuncios(); carregarAnuncios(); }
+  if(confirm("Excluir anúncio?")) {
+    await sb.from('anuncios').delete().eq('id', id);
+    carregarMeusAnuncios(); carregarAnuncios();
   }
+}
+
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  if (itemPhotos.length + files.length > 10) return alert("Máximo 10 fotos.");
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoGrid() {
+  document.getElementById('photoGrid').innerHTML = itemPhotos.map((src, i) => `
+    <div class="photo-item-cad">
+      <img src="${src}">
+      <button class="btn-del-photo" onclick="itemPhotos.splice(${i}, 1); renderPhotoGrid();">✕</button>
+    </div>
+  `).join('');
 }
 
 async function salvarTudo() {
   const nome = document.getElementById('cadNome').value;
   const sobrenome = document.getElementById('cadSobrenome').value;
   const wpp = document.getElementById('cadWpp').value;
-  if (!nome || !sobrenome || wpp.length < 10) return alert("Preencha nome completo e WhatsApp válido.");
+  if (!nome || !sobrenome || !wpp) return alert("Preencha Nome, Sobrenome e WhatsApp.");
 
-  const u = { 
-    id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: wpp, tipo: tipoUsuario, 
-    bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, 
-    apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, 
-    setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, 
-    foto_url: currentUser.user_metadata.avatar_url 
-  };
+  const u = { id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: wpp, tipo: tipoUsuario, bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
-  const a = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
-  await sb.from('anuncios').insert([a]);
-  alert("Enviado para moderação!"); closeModal('cadOverlay'); showTab('myads');
+  await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
+  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads');
 }
 
-let activeTab = 'home';
 function showTab(tab) {
-    activeTab = tab;
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
     document.getElementById('navHomeBtn').classList.toggle('active', tab === 'home');
@@ -363,19 +354,11 @@ function showTab(tab) {
     if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
-function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad(); }
+function handleAnunciarClick() { if (!currentUser) loginGoogle(); else { openCad(); } }
+function openCad() { itemPhotos = []; renderPhotoGrid(); goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
-function openCad() { itemPhotos = []; document.getElementById('photoGrid').innerHTML=''; goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
-function setTipo(t) { 
-  tipoUsuario = t; 
-  document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; 
-  document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; 
-  document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
-  document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
-}
-function handlePhotos(input) { const files = Array.from(input.files); files.forEach(file => { const reader = new FileReader(); reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); }; reader.readAsDataURL(file); }); }
-function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div style="aspect-ratio:1; border-radius:8px; overflow:hidden;"><img src="${src}" style="width:100%; height:100%; object-fit:cover;"></div>`).join(''); }
+function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
 
 window.onload = () => { setupCategorias(); carregarAnuncios(); };
 </script>
