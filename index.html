@@ -17,55 +17,58 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ─ ESTILOS PREMIUM DO INDEX(1) ─ */
 :root {
   --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
   --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
   --forest: #1E3A2F; --forest-mid: #2E5943; --forest-light: #D4E8DC;
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366;
-  --red: #C0392B; --red-light: #FDECEA;
+  --red: #C0392B; --red-light: #FDECEA; --orange: #E07B2A; --orange-light: #FEF3E2;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; border-left:1px solid var(--border); border-right:1px solid var(--border); }
+body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; position:relative; border-left:1px solid var(--border); border-right:1px solid var(--border); }
 
-/* UI COMPONENTS */
+/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; }
 .brand { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--gold); }
-.btn-offer { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-offer { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; transition:.2s; }
 .btn-login { background:transparent; border:1px solid var(--gold); color:var(--gold); margin-right:8px; }
 
-.hero { background:var(--forest); padding:32px 20px 28px; color:white; }
-.hero h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:18px; }
-.hero h1 em { color:var(--gold); font-style:italic; }
-.search-wrap { display:flex; background:white; border-radius:12px; overflow:hidden; }
-.search-wrap input { flex:1; border:none; padding:13px 16px; outline:none; }
-.search-wrap button { background:var(--gold); border:none; padding:0 18px; }
+/* HERO */
+.hero { background:var(--forest); padding:32px 20px 28px; position:relative; overflow:hidden; color:white; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom:18px; position:relative; z-index:2; }
+.hero h1 em { font-style:italic; color:var(--gold); }
+.search-wrap { display:flex; background:white; border-radius:12px; overflow:hidden; position:relative; z-index:2; box-shadow:0 8px 32px rgba(0,0,0,.2); }
+.search-wrap input { flex:1; border:none; padding:13px 16px; outline:none; font-family:inherit; font-size:14px; }
+.search-wrap button { background:var(--gold); border:none; padding:0 18px; cursor:pointer; }
 
-.stats-bar { display:flex; background:var(--gold-pale); border-bottom:1px solid var(--gold-light); padding:10px 20px; text-align:center; }
-.stat { flex:1; }
-.stat-num { font-family:'Playfair Display',serif; font-size:20px; color:var(--gold); }
-.stat-label { font-size:10px; color:var(--muted); }
-
-/* CARDS */
+/* CATEGORIAS (TODAS DO INDEX 1) */
 .section { padding:24px 20px 0; }
 .sec-title { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:14px; display:block; }
-.plist { display:flex; flex-direction:column; gap:10px; padding-bottom:100px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
-.pcard-avatar { width:48px; height:48px; background:#eee; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-.pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
-.pcard-svc { font-size:12px; color:var(--muted); margin-bottom:4px; }
+.cats { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; }
+.cats::-webkit-scrollbar { display:none; }
+.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; font-weight:500; cursor:pointer; transition:.2s; display:flex; align-items:center; gap:6px; }
+.cat-pill.active { background:var(--forest); border-color:var(--forest); color:white; }
 
-/* MODAL & FORM */
-.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:100; display:none; padding:20px; overflow-y:auto; }
+/* CARDS */
+.plist { display:flex; flex-direction:column; gap:10px; padding:0 20px 100px; }
+.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; gap:12px; align-items:center; transition:.2s; }
+.pcard-avatar { width:50px; height:50px; border-radius:12px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; }
+.pcard-body { flex:1; min-width:0; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:2px; }
+.pcard-svc { font-size:12px; color:var(--muted); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pill { font-size:10px; font-weight:600; padding:3px 9px; border-radius:100px; background:var(--gold-pale); color:var(--gold); }
+
+/* OVERLAY & STEPS */
+.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.98); z-index:100; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
-.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:40px; }
-.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.modal-card { background:var(--paper); border-radius:24px; padding:24px; color:var(--ink); max-width:100%; margin-top:20px; }
 .cad-step { display:none; }
 .cad-step.active { display:block; }
-.field { margin-bottom:15px; }
-.field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
-.btn-full { width:100%; padding:14px; border-radius:12px; border:none; font-weight:700; cursor:pointer; margin-top:10px; }
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:6px; letter-spacing:1px; }
+.field input, .field select, .field textarea { width:100%; background:white; border:1.5px solid var(--border); border-radius:10px; padding:12px; font-family:inherit; outline:none; font-size:14px; }
+.btn-full { width:100%; padding:15px; border-radius:12px; border:none; font-weight:700; cursor:pointer; margin-top:10px; font-size:14px; }
 </style>
 </head>
 <body>
@@ -79,66 +82,78 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="hero">
-  <h1>Anúncios dos seus <em>vizinhos</em></h1>
+  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
   <div class="search-wrap">
     <input type="text" id="searchInput" placeholder="O que você procura?" oninput="applyFilters()">
     <button>🔍</button>
   </div>
 </div>
 
-<div class="stats-bar">
-  <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Anúncios</div></div>
-  <div class="stat"><div class="stat-num">Grátis</div><div class="stat-label">Para Moradores</div></div>
+<div class="section">
+  <span class="sec-title">Categorias</span>
+  <div class="cats" id="catBar">
+    <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Saúde')">🩺 Saúde</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Beleza')">✂️ Beleza</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Reformas')">🏗️ Reformas</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Automotivo')">🔧 Automotivo</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Educação')">📚 Educação</div>
+    <div class="cat-pill" onclick="filterCat(this, 'Pets')">🐾 Pets</div>
+  </div>
 </div>
 
 <div class="section">
-  <span class="sec-title">Recentes</span>
+  <span class="sec-title" id="secTitle">Recentes</span>
   <div class="plist" id="plist"></div>
 </div>
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
-    <div class="modal-header">
-      <h2 style="font-family:'Playfair Display';">Novo Anúncio</h2>
-      <button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">×</button>
+    <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:20px;">
+      <h2 style="font-family:'Playfair Display';">Publicar Anúncio</h2>
+      <button style="background:none; border:none; font-size:28px;" onclick="closeModal('cadOverlay')">×</button>
     </div>
 
     <div class="cad-step active" id="step0">
-      <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 1: Identificação</p>
       <div class="field">
         <label>Seu Nome</label>
-        <input type="text" id="cadNome" placeholder="Como quer ser chamado?">
+        <input type="text" id="cadNome" placeholder="Ex: Rodrigo Araújo">
       </div>
       <div class="field">
         <label>WhatsApp (com DDD)</label>
         <input type="tel" id="cadWpp" placeholder="Ex: 21999999999">
       </div>
       <div class="field">
-        <label>Seu Bloco</label>
-        <input type="text" id="cadBloco" placeholder="Ex: Bloco 2">
+        <label>Seu Bloco / Unidade</label>
+        <input type="text" id="cadBloco" placeholder="Ex: Bloco 2 - Ap 403">
       </div>
-      <button class="btn-full" style="background:var(--gold); color:white;" onclick="goStep(1)">Próximo Passo</button>
+      <button class="btn-full" style="background:var(--gold); color:white;" onclick="goStep(1)">Próximo: Dados do Anúncio</button>
     </div>
 
     <div class="cad-step" id="step1">
-      <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 2: O que você oferece?</p>
       <div class="field">
         <label>Título do Anúncio</label>
-        <input type="text" id="cadTitulo" placeholder="Ex: Venda de Bolos, Aula de Inglês">
+        <input type="text" id="cadTitulo" placeholder="Ex: Bolos Caseiros sob encomenda">
       </div>
       <div class="field">
         <label>Categoria</label>
         <select id="cadCat">
-          <option value="Gastronomia">Gastronomia</option>
-          <option value="Serviços">Serviços</option>
           <option value="Saúde">Saúde</option>
           <option value="Beleza">Beleza</option>
+          <option value="Reformas">Reformas</option>
+          <option value="Gastronomia">Gastronomia</option>
+          <option value="Imóveis">Imóveis</option>
+          <option value="Automotivo">Automotivo</option>
+          <option value="Educação">Educação</option>
+          <option value="Pets">Pets</option>
           <option value="Outros">Outros</option>
         </select>
       </div>
       <div class="field">
-        <label>Descrição</label>
-        <textarea id="cadDesc" rows="3" placeholder="Conte mais detalhes..."></textarea>
+        <label>Descrição detalhada</label>
+        <textarea id="cadDesc" rows="4" placeholder="Descreva seu serviço, horários, preços..."></textarea>
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn-full" style="background:#eee;" onclick="goStep(0)">Voltar</button>
@@ -149,9 +164,12 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <script>
-// --- AUTH ---
+// --- AUTENTICAÇÃO ---
 async function loginGoogle() {
-  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://refinatto-servicos.vercel.app' } });
+  await sb.auth.signInWithOAuth({ 
+    provider: 'google', 
+    options: { redirectTo: 'https://refinatto-servicos.vercel.app' } 
+  });
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -166,8 +184,10 @@ sb.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// --- DADOS ---
+// --- DADOS DO BANCO ---
 let currentData = [];
+let activeCat = '';
+
 async function carregarAnuncios() {
   const { data, error } = await sb.from('anuncios').select('*').order('criado_em', { ascending: false });
   if (!error) { currentData = data; renderList(data); }
@@ -176,7 +196,6 @@ async function carregarAnuncios() {
 function renderList(list) {
   const container = document.getElementById('plist');
   container.innerHTML = '';
-  document.getElementById('totalCount').textContent = list.length;
   list.forEach(item => {
     const card = document.createElement('div');
     card.className = 'pcard';
@@ -184,22 +203,16 @@ function renderList(list) {
       <div class="pcard-avatar">👤</div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
-        <div class="pcard-svc">${item.categoria} • ${item.localizacao_bloco || 'Refinatto'}</div>
+        <div class="pcard-svc">${item.categoria} • ${item.localizacao_bloco || ''}</div>
+        <div class="pill">${item.descricao?.substring(0,30)}...</div>
       </div>
-      <button class="btn-wpp" style="background:var(--wpp); color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;" onclick="window.open('https://wa.me/55${item.whatsapp}')">💬</button>
+      <button class="btn-offer" style="background:var(--wpp); color:white; padding:10px; border-radius:12px;" onclick="window.open('https://wa.me/55${item.whatsapp}')">💬</button>
     `;
     container.append(card);
   });
 }
 
-// --- FORMULÁRIO ---
-function goStep(n) {
-  document.querySelectorAll('.cad-step').forEach((s, idx) => s.classList.toggle('active', idx === n));
-}
-
-function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
+// --- SALVAMENTO ---
 async function salvarAnuncio() {
   const payload = {
     titulo: document.getElementById('cadTitulo').value,
@@ -211,13 +224,30 @@ async function salvarAnuncio() {
   };
 
   const { error } = await sb.from('anuncios').insert([payload]);
-  if (error) { alert("Erro: " + error.message); } 
-  else { alert("Publicado!"); closeModal('cadOverlay'); carregarAnuncios(); }
+  if (error) { alert("Erro ao salvar: " + error.message); }
+  else { alert("Anúncio publicado!"); closeModal('cadOverlay'); carregarAnuncios(); }
+}
+
+// --- NAVEGAÇÃO E FILTROS ---
+function goStep(n) {
+  document.querySelectorAll('.cad-step').forEach((s, idx) => s.classList.toggle('active', idx === n));
+}
+function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function filterCat(el, cat) {
+  document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeCat = cat;
+  applyFilters();
 }
 
 function applyFilters() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  renderList(currentData.filter(i => i.titulo.toLowerCase().includes(q)));
+  let filtered = currentData;
+  if (activeCat) filtered = filtered.filter(i => i.categoria === activeCat);
+  if (q) filtered = filtered.filter(i => i.titulo.toLowerCase().includes(q));
+  renderList(filtered);
 }
 
 window.onload = carregarAnuncios;
