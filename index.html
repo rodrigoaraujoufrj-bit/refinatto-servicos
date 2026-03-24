@@ -10,15 +10,19 @@
 <script>
   // CONFIGURAÇÃO OFICIAL - Project ID: lrksdcydpsvdqzmxildj
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
+  // IMPORTANTE: Cole sua Publishable Key completa da image_fe4e46 abaixo
   const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   let currentUser = null;
+  let photoData = null; // Para a foto de perfil
+  let itemPhotos = []; // Para as fotos do anúncio
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-/* ─ ESTILOS PREMIUM DO REFINATTO ─ */
+/* RESTAURANDO O CSS PREMIUM DO SEU PROTÓTIPO */
 :root {
   --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
   --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
@@ -29,27 +33,23 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; border-left:1px solid var(--border); border-right:1px solid var(--border); }
 
-/* TOPBAR */
+/* TOPBAR & HERO */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:56px; }
 .brand { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--gold); }
 .btn-offer { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; }
 .btn-login { background:transparent; border:1px solid var(--gold); color:var(--gold); margin-right:8px; }
 
-/* HERO */
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:18px; }
 .hero h1 em { color:var(--gold); font-style:italic; }
 
-/* LISTAGEM */
-.section { padding:24px 20px 0; }
-.sec-title { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:14px; display:block; }
+/* LISTAGEM DE CARDS REAIS */
 .plist { display:flex; flex-direction:column; gap:12px; padding:20px 20px 100px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
 .pcard-avatar { width:48px; height:48px; background:#eee; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; overflow:hidden; }
-.pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
+.pcard-avatar img { width:100%; height:100%; object-fit:cover; }
 
-/* MODAL / FORM */
+/* SISTEMA DE PASSOS DO FORMULÁRIO (RESTAURADO) */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:100; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:40px; }
@@ -57,8 +57,10 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .cad-step.active { display:block; }
 .field { margin-bottom:15px; }
 .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; font-size:14px; }
+.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
 .btn-full { width:100%; padding:14px; border-radius:12px; border:none; font-weight:700; cursor:pointer; margin-top:10px; }
+.opt-btn { flex:1; padding:9px 6px; border:1.5px solid var(--border); border-radius:10px; text-align:center; cursor:pointer; font-size:12px; }
+.opt-btn.selected { border-color:var(--forest); background:var(--forest-light); color:var(--forest); font-weight:600; }
 </style>
 </head>
 <body>
@@ -72,33 +74,39 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="hero">
-  <h1>Anúncios dos seus <em>vizinhos</em></h1>
+  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
 </div>
 
 <div class="section">
-  <span class="sec-title">Últimos anúncios</span>
   <div class="plist" id="plist"></div>
 </div>
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:20px;">
-      <h2 style="font-family:'Playfair Display';">Novo Anúncio</h2>
+      <h2 style="font-family:'Playfair Display';">Publicar Anúncio</h2>
       <button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button>
     </div>
 
     <div class="cad-step active" id="step0">
       <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 1: Seus dados de contato</p>
       <div class="field">
-        <label>Seu Nome</label>
-        <input type="text" id="cadNome" placeholder="Ex: Rodrigo Araújo">
+        <label>Nome Completo</label>
+        <input type="text" id="cadNome" placeholder="Seu nome">
+      </div>
+      <div class="field">
+          <label>Você é:</label>
+          <div style="display:flex;gap:8px">
+              <div id="optM" class="opt-btn selected" onclick="setTipo('morador')">🏠 Morador</div>
+              <div id="optF" class="opt-btn" onclick="setTipo('funcionario')">👷 Funcionário</div>
+          </div>
       </div>
       <div class="field">
         <label>WhatsApp (com DDD)</label>
         <input type="tel" id="cadWpp" placeholder="Ex: 21999999999">
       </div>
       <div class="field">
-        <label>Bloco/Apartamento</label>
+        <label>Bloco / Unidade / Setor</label>
         <input type="text" id="cadBloco" placeholder="Ex: Bloco 2, Ap 403">
       </div>
       <button class="btn-full" style="background:var(--gold); color:white;" onclick="goStep(1)">Próximo Passo</button>
@@ -108,23 +116,24 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 2: O que você oferece?</p>
       <div class="field">
         <label>Título do Anúncio</label>
-        <input type="text" id="cadTitulo" placeholder="Ex: Bolos de Pote">
+        <input type="text" id="cadTitulo" placeholder="Ex: Bolos de Pote, Dentista...">
       </div>
       <div class="field">
         <label>Categoria</label>
         <select id="cadCat">
-          <option value="Gastronomia">🍽️ Gastronomia</option>
-          <option value="Serviços">🛠️ Serviços</option>
           <option value="Saúde">🩺 Saúde</option>
           <option value="Beleza">✂️ Beleza</option>
+          <option value="Gastronomia">🍽️ Gastronomia</option>
           <option value="Reformas">🏗️ Reformas</option>
           <option value="Automotivo">🔧 Automotivo</option>
+          <option value="Imóveis">🔑 Imóveis</option>
           <option value="Pets">🐾 Pets</option>
           <option value="Aulas">📚 Aulas</option>
+          <option value="Desapega">🏷️ Desapega</option>
         </select>
       </div>
       <div class="field">
-        <label>Descrição</label>
+        <label>Descrição Detalhada</label>
         <textarea id="cadDesc" rows="3" placeholder="Detalhes do seu serviço..."></textarea>
       </div>
       <div style="display:flex; gap:10px;">
@@ -136,7 +145,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <script>
-// --- AUTENTICAÇÃO ---
+// --- LÓGICA DE LOGIN COM GOOGLE ---
 async function loginGoogle() {
   await sb.auth.signInWithOAuth({ 
     provider: 'google', 
@@ -153,7 +162,7 @@ sb.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// --- CARREGAR DADOS COM RELACIONAMENTO ---
+// --- CARREGAR DADOS COM JOIN ---
 async function carregarAnuncios() {
   const { data, error } = await sb
     .from('anuncios')
@@ -170,7 +179,7 @@ function renderList(list) {
     const card = document.createElement('div');
     card.className = 'pcard';
     card.innerHTML = `
-      <div class="pcard-avatar">👤</div>
+      <div class="pcard-avatar">${item.usuarios?.foto_url ? `<img src="${item.usuarios.foto_url}">` : '👤'}</div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
         <div class="pcard-svc">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
@@ -182,13 +191,13 @@ function renderList(list) {
   });
 }
 
-// --- SALVAMENTO CONSOLIDADO (CORREÇÃO DO EMAIL) ---
+// --- SALVAMENTO EM DUAS TABELAS COM CORREÇÃO DE EMAIL ---
 async function salvarTudo() {
-  const { id, email } = currentUser; // Pegamos o e-mail do login do Google
+  const { id, email } = currentUser;
 
   const userPayload = {
-    id: id,
-    email: email, // Resolve o erro de NOT NULL da coluna email
+    id,
+    email, // CORREÇÃO PARA O ERRO NOT-NULL
     nome: document.getElementById('cadNome').value,
     whatsapp: document.getElementById('cadWpp').value,
     bloco: document.getElementById('cadBloco').value
@@ -201,25 +210,28 @@ async function salvarTudo() {
     descricao: document.getElementById('cadDesc').value
   };
 
-  // 1. Atualizar Perfil na tabela 'usuarios'
   const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
   if (err1) return alert("Erro no perfil: " + err1.message);
 
-  // 2. Inserir Anúncio na tabela 'anuncios'
   const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
   if (err2) return alert("Erro no anúncio: " + err2.message);
 
-  alert("Anúncio publicado com sucesso!");
+  alert("Publicado com sucesso!");
   closeModal('cadOverlay');
   carregarAnuncios();
 }
 
-// --- UI / NAVEGAÇÃO ---
+// --- NAVEGAÇÃO UI (RESTAURADA) ---
 function goStep(n) {
   document.querySelectorAll('.cad-step').forEach((s, idx) => s.classList.toggle('active', idx === n));
 }
 function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function setTipo(tipo) {
+    document.getElementById('optM').classList.toggle('selected', tipo === 'morador');
+    document.getElementById('optF').classList.toggle('selected', tipo === 'funcionario');
+}
 
 window.onload = carregarAnuncios;
 </script>
