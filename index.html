@@ -8,14 +8,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+  // CONFIGURAÇÃO OFICIAL
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
+  const SUPABASE_KEY = 'SUA_CHAVE_PUBLISHABLE_AQUI' // Cole a chave de image_fe4e46.png
+
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  
   let currentUser = null;
   let tipoUsuario = 'morador';
   let currentData = [];
-  let itemPhotos = [];
+  let itemPhotos = []; // Armazena as fotos do anúncio
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -29,7 +30,7 @@
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366; --red: #C0392B;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 90px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
+body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 95px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
 /* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
@@ -41,12 +42,14 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 20px; margin-bottom: 4px; }
 
-/* FORMULÁRIO */
+/* MODAL OVERLAY */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:200; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; }
 .cad-step { display:none; }
 .cad-step.active { display:block; }
+
+/* FORM FIELDS */
 .field { margin-bottom:15px; }
 .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
 .field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; font-size:14px; }
@@ -66,6 +69,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 11px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); }
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
+.pcard-body { flex:1; min-width:0; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
 </style>
 </head>
 <body>
@@ -76,7 +81,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Aviso:</strong> A plataforma não se responsabiliza por negociações. Verifique a procedência com seus vizinhos.
+  ⚠️ <strong>Aviso:</strong> A plataforma é um canal entre vizinhos. Não nos responsabilizamos pelas negociações.
 </div>
 
 <div id="pageHome">
@@ -84,21 +89,21 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
         <div class="cat-pill" onclick="filterCat(this, 'Saúde')">🩺 Saúde</div>
         <div class="cat-pill" onclick="filterCat(this, 'Beleza')">✂️ Beleza</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Atividades')">🏃 Atividades</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
         <div class="cat-pill" onclick="filterCat(this, 'Reformas')">🏗️ Reformas</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Festas')">🎈 Festas</div>
         <div class="cat-pill" onclick="filterCat(this, 'Automotivo')">🔧 Automotivo</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Pets')">🐾 Pets</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Aulas')">📚 Aulas</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Festas')">🎈 Festas</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Vagas')">🅿️ Vagas</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Transporte')">🚕 Transporte</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Desapega')">🏷️ Desapega</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Doações')">🤝 Doações</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Atividades')">🏃 Atividades</div>
         <div class="cat-pill" onclick="filterCat(this, 'Estética Auto')">🚿 Estética Auto</div>
         <div class="cat-pill" onclick="filterCat(this, 'Venda Auto')">🚘 Venda Auto</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Vagas')">🅿️ Vagas</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
         <div class="cat-pill" onclick="filterCat(this, 'Corretores')">🏢 Corretores</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Aulas')">📚 Aulas</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Transporte')">🚕 Transporte</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Pets')">🐾 Pets</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Doações')">🤝 Doações</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Desapega')">🏷️ Desapega</div>
         <div class="cat-pill" onclick="filterCat(this, 'Outros')">⭐ Outros</div>
     </div>
     <div class="plist" id="plist"></div>
@@ -136,29 +141,30 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       
       <div id="fieldsMorador">
         <div style="display:flex; gap:10px;">
-          <div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div>
-          <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
+          <div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco" placeholder="Ex: 1"></div>
+          <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto" placeholder="Ex: 403"></div>
         </div>
       </div>
       <div id="fieldsFunc" style="display:none;">
-        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div>
+        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Portaria"></div>
       </div>
       <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
       <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
 
     <div class="cad-step" id="step1">
-      <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
+      <div class="field"><label>Título</label><input type="text" id="cadTitulo" placeholder="Ex: Marmitas Caseiras"></div>
       <div class="field">
         <label>Categoria</label>
         <select id="cadCat">
           <option value="Gastronomia">Gastronomia</option>
           <option value="Saúde">Saúde</option>
-          <option value="Reformas">Reformas</option>
+          <option value="Serviços">Serviços</option>
           <option value="Imóveis">Imóveis</option>
+          <option value="Outros">Outros</option>
         </select>
       </div>
-      <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
+      <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3" placeholder="Detalhes do seu serviço..."></textarea></div>
       
       <div class="field">
         <label>Fotos (até 10)</label>
@@ -176,7 +182,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <script>
-// --- LOGICA DE FOTOS ---
+// --- LÓGICA DE FOTOS ---
 function handlePhotos(input) {
     const files = Array.from(input.files);
     if (itemPhotos.length + files.length > 10) return alert("Máximo de 10 fotos permitido.");
@@ -201,7 +207,7 @@ function renderPhotoGrid() {
     `).join('');
 }
 
-// --- LOGICA DE TELA ---
+// --- NAVEGAÇÃO E TIPO ---
 function setTipo(t) {
     tipoUsuario = t;
     document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white';
@@ -210,7 +216,7 @@ function setTipo(t) {
     document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none';
 }
 
-function handleAnunciarClick() { if (!currentUser) { loginGoogle(); } else { openCad(); } }
+function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad(); }
 
 function showTab(tab) {
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
@@ -218,9 +224,12 @@ function showTab(tab) {
     if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
-// --- SUPABASE & AUTH ---
+// --- AUTH ---
 async function loginGoogle() {
-    await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } });
+    await sb.auth.signInWithOAuth({ 
+        provider: 'google', 
+        options: { redirectTo: window.location.origin + window.location.pathname } 
+    });
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -229,7 +238,7 @@ sb.auth.onAuthStateChange((event, session) => {
     carregarAnuncios();
 });
 
-// --- OPERAÇÕES DE BANCO ---
+// --- OPERAÇÕES SUPABASE ---
 async function carregarAnuncios() {
     const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
     currentData = data || [];
@@ -239,6 +248,7 @@ async function carregarAnuncios() {
 function renderList(list) {
     document.getElementById('plist').innerHTML = list.map(item => `
         <div class="pcard">
+            <div class="pcard-avatar">👤</div>
             <div class="pcard-body">
                 <div class="pcard-name">${item.titulo}</div>
                 <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
@@ -268,10 +278,10 @@ async function deletarAnuncio(id) {
 async function salvarTudo() {
     if(!currentUser) return loginGoogle();
     
-    // 1. Perfil
+    // 1. Grava no Perfil (Tabela 'usuarios')
     const userPayload = { 
         id: currentUser.id, 
-        email: currentUser.email, 
+        email: currentUser.email, // Obrigatório para evitar erro 'null'
         nome: currentUser.user_metadata.full_name,
         whatsapp: document.getElementById('cadWpp').value,
         tipo: tipoUsuario,
@@ -280,13 +290,13 @@ async function salvarTudo() {
         setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null
     };
 
-    // 2. Anúncio (Enviando fotos como array)
+    // 2. Grava o Anúncio (Tabela 'anuncios')
     const adPayload = {
         usuario_id: currentUser.id,
         titulo: document.getElementById('cadTitulo').value,
         categoria: document.getElementById('cadCat').value,
         descricao: document.getElementById('cadDesc').value,
-        fotos: itemPhotos // Certifique-se de que a coluna fotos existe no banco
+        fotos: itemPhotos // Certifique-se de que a coluna fotos existe
     };
 
     const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
@@ -299,6 +309,7 @@ async function salvarTudo() {
     }
 }
 
+// --- UI HELPERS ---
 function filterCat(el, cat) {
     document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
@@ -306,7 +317,7 @@ function filterCat(el, cat) {
 }
 
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
-function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
+function openCad() { itemPhotos = []; renderPhotoGrid(); goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 window.onload = carregarAnuncios;
