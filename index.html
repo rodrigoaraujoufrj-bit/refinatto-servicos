@@ -33,10 +33,10 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR CORRIGIDA */
+/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
-.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:8px 16px; font-size:11px; font-weight:800; cursor:pointer; text-transform:uppercase; }
+.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
@@ -45,35 +45,41 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* CARDS COM FOTO DE PERFIL E MINIATURA */
+/* CARDS LISTA */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:18px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; }
-.pcard-profile-wrapper { width: 40px; height: 40px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1px solid var(--gold-light); }
+.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
+.pcard:active { transform: scale(0.98); }
+.pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
 .pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
-.pcard-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.pcard-thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #eee; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); margin-bottom: 2px; }
+.pcard-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+.pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
 /* NAV BOTTOM */
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* MODAIS */
+/* MODAIS E FORMULÁRIO */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
-.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; position: relative; }
-.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
-.detail-photos img { height: 180px; border-radius: 12px; object-fit: cover; }
+.modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
+.cad-step { display: none; }
+.cad-step.active { display: block; }
 
-/* CATEGORIAS */
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; }
+.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
+.detail-photos img { height: 180px; border-radius: 16px; object-fit: cover; }
+
 .cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
-.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
+.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
 .status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
 .status-pending { background: #FFF3CD; color: #856404; }
 .status-approved { background: #D4EDDA; color: #155724; }
@@ -89,17 +95,15 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   </div>
 </div>
 
-<div class="hero" id="heroSection">
-  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
-</div>
-
-<div class="disclaimer">
-  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações ou qualidade.
-</div>
-
 <div id="pageHome">
-    <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div></div>
-    <div class="plist" id="plist"></div>
+  <div class="hero" id="heroSection">
+    <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
+  </div>
+  <div class="disclaimer">
+    ⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos. A plataforma não se responsabiliza pelas negociações.
+  </div>
+  <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div></div>
+  <div class="plist" id="plist"></div>
 </div>
 
 <div id="pageMyAds" style="display:none; padding:20px;">
@@ -114,11 +118,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <h2 id="detTitle" style="font-family:'Playfair Display', serif; margin-bottom:10px;"></h2>
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
     <div class="detail-photos" id="detPhotos"></div>
-    <p id="detDesc" style="line-height:1.6; margin-bottom:20px; font-size:14px;"></p>
-    <div id="adminControls" style="display:none; padding:15px; background:#f0f0f0; border-radius:12px; margin-bottom:15px; border:1px solid var(--border);">
+    <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444;"></p>
+    <div id="adminControls" style="display:none; padding:15px; background:var(--gold-pale); border-radius:16px; margin-bottom:15px; border:1px solid var(--gold-light);">
        <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
     </div>
-    <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
+    <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white; display:flex; align-items:center; justify-content:center; gap:8px;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
 
@@ -131,22 +135,47 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2 style="font-family:'Playfair Display';">Novo Anúncio</h2><button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button></div>
+    
     <div class="cad-step active" id="step0">
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
             <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
-        <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
-        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
+        <div style="display:flex; gap:10px;">
+          <div class="field" style="flex:1;"><label>Nome</label><input type="text" id="cadNome"></div>
+          <div class="field" style="flex:1;"><label>Sobrenome</label><input type="text" id="cadSobrenome"></div>
+        </div>
+        <div id="fieldsMorador">
+          <div style="display:flex; gap:10px;">
+            <div class="field" style="flex:1;"><label>Bloco</label>
+              <select id="cadBloco">
+                <option value="1">Bloco 1</option>
+                <option value="2">Bloco 2</option>
+                <option value="3">Bloco 3</option>
+                <option value="4">Bloco 4</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
+          </div>
+        </div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
         <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
+
     <div class="cad-step" id="step1">
-        <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
+        <div class="field"><label>Título do que está anunciando</label><input type="text" id="cadTitulo"></div>
         <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
-        <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
-        <div class="field"><label>Fotos (Máx 10)</label><input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;"><button class="btn-primary" style="background:white; border:1px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button><div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;"></div></div>
-        <button class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
+        <div class="field"><label>Descrição Detalhada</label><textarea id="cadDesc" rows="3"></textarea></div>
+        <div class="field"><label>Fotos (Máx 10)</label>
+          <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;">
+          <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
+          <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;"></div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1;" onclick="goStep(0)">Voltar</button>
+          <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Enviar para Aprovação</button>
+        </div>
     </div>
   </div>
 </div>
@@ -189,8 +218,9 @@ function renderList(list) {
   const container = document.getElementById('plist');
   container.innerHTML = list.map(item => {
     const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
-    // Fallback elegante se a foto do Google falhar
+    // PRIORIZA FOTO DO GOOGLE, CASO NÃO TENHA, USA INICIAIS
     const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
+    const loc = item.usuarios?.tipo === 'morador' ? `Bloco ${item.usuarios.bloco} • Apto ${item.usuarios.apartamento}` : item.usuarios?.setor;
 
     return `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
@@ -199,7 +229,7 @@ function renderList(list) {
       </div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
-        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
+        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc || ''}</div>
         ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
       </div>
       ${thumb}
@@ -212,7 +242,8 @@ function verDetalhes(id) {
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
   document.getElementById('detTitle').innerText = ad.titulo;
-  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome || 'Vizinho'}`;
+  const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor;
+  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
   document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
   document.getElementById('detPhotos').style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
@@ -223,7 +254,7 @@ function verDetalhes(id) {
   const cleanNum = rawNum.replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => {
     if (cleanNum && cleanNum.length >= 10) {
-        const msg = encodeURIComponent(`Olá, vi seu anúncio "${ad.titulo}" no Refinatto Serviços e gostaria de mais informações.`);
+        const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto e gostaria de mais informações.`);
         window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
     } else alert("WhatsApp inválido.");
   };
@@ -239,7 +270,7 @@ async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
   if (data) data.forEach(ad => { if (!currentData.find(item => item.id === ad.id)) currentData.push(ad); });
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
-    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
+    <div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
       <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span></div>
       <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button>
     </div>
@@ -254,20 +285,32 @@ async function deletarAnuncio(id) {
 }
 
 async function salvarTudo() {
+  const nome = document.getElementById('cadNome').value;
+  const sobrenome = document.getElementById('cadSobrenome').value;
   const wpp = document.getElementById('cadWpp').value;
-  if (!wpp || wpp.length < 10) return alert("WhatsApp inválido.");
-  const u = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: wpp, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
+  if (!nome || !sobrenome || !wpp) return alert("Por favor, preencha Nome, Sobrenome e WhatsApp.");
+
+  const u = { 
+    id: currentUser.id, 
+    email: currentUser.email, 
+    nome: `${nome} ${sobrenome}`, 
+    whatsapp: wpp, 
+    tipo: tipoUsuario, 
+    bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, 
+    apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, 
+    setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, 
+    foto_url: currentUser.user_metadata.avatar_url 
+  };
   await sb.from('usuarios').upsert(u);
   const a = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
-  const { error } = await sb.from('anuncios').insert([a]);
-  if (!error) { alert("Enviado para moderação!"); closeModal('cadOverlay'); showTab('myads'); }
+  await sb.from('anuncios').insert([a]);
+  alert("Enviado para moderação!"); closeModal('cadOverlay'); showTab('myads');
 }
 
 let activeTab = 'home';
 function showTab(tab) {
     activeTab = tab;
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
-    document.getElementById('heroSection').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
     document.getElementById('navHomeBtn').classList.toggle('active', tab === 'home');
     document.getElementById('navUserBtn').classList.toggle('active', tab === 'myads');
@@ -278,7 +321,13 @@ function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad()
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function openCad() { itemPhotos = []; document.getElementById('photoGrid').innerHTML=''; goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
-function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
+function setTipo(t) { 
+  tipoUsuario = t; 
+  document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; 
+  document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; 
+  document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
+  document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
+}
 function handlePhotos(input) { const files = Array.from(input.files); files.forEach(file => { const reader = new FileReader(); reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); }; reader.readAsDataURL(file); }); }
 function renderPhotoGrid() { document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div style="aspect-ratio:1; border-radius:8px; overflow:hidden;"><img src="${src}" style="width:100%; height:100%; object-fit:cover;"></div>`).join(''); }
 function filterCat(el, cat) { document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active')); el.classList.add('active'); renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData); }
