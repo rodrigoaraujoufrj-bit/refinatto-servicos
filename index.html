@@ -39,41 +39,60 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
+/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
+/* HERO */
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; }
 .hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
+/* DISCLAIMER */
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
+/* NAV BOTTOM (CORRIGIDO: SEM OPACIDADE) */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
+/* LISTAGEM */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; }
+.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; transition: 0.2s; }
+.pcard:active { transform: scale(0.98); background: #f0f0f0; }
 .pcard-body { flex:1; min-width:0; }
 .pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:4px; }
 
+/* STATUS NO PERFIL */
+.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+.status-pending { background: #FFF3CD; color: #856404; }
+.status-approved { background: #D4EDDA; color: #155724; }
+
+/* MODAL / OVERLAY */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; position: relative; }
+
+/* DETALHES */
 .detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
 .detail-photos img { height: 180px; border-radius: 12px; object-fit: cover; }
 
+/* CATEGORIAS */
 .cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 
+/* FOTOS NO CADASTRO */
+.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.photo-item { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.photo-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; }
+
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
-.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
-.status-pending { background: #FFF3CD; color: #856404; }
-.status-approved { background: #D4EDDA; color: #155724; }
+.btn-del { color: var(--red); font-weight: 600; background: none; border: none; cursor: pointer; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -91,7 +110,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações ou qualidade dos serviços ofertados.
+  ⚠️ <strong>Termo de Uso:</strong> O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não se responsabiliza por comercializações, pagamentos ou qualidade dos serviços ofertados.
 </div>
 
 <div id="pageHome">
@@ -138,8 +157,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
             <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
         <div id="fieldsMorador"><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div></div></div>
-        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
-        <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="Ex: 21999999999"></div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
+        <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
     <div class="cad-step" id="step1">
@@ -157,6 +176,7 @@ function setupCategorias() {
     const bar = document.getElementById('catBar');
     const select = document.getElementById('cadCat');
     bar.innerHTML = '<div class="cat-pill active" onclick="filterCat(this, \'\')">🏠 Todos</div>';
+    select.innerHTML = '';
     CATEGORIAS_LISTA.forEach(cat => {
         const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = cat;
         pill.onclick = () => filterCat(pill, cat); bar.appendChild(pill);
@@ -173,22 +193,31 @@ async function logout() { await sb.auth.signOut(); window.location.reload(); }
 
 sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
-  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
-  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
-  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
+  const btnLogin = document.getElementById('btnLogin');
+  const userHeader = document.getElementById('userHeader');
+
+  if (currentUser) {
+    btnLogin.style.display = 'none';
+    userHeader.style.display = 'block';
+    userHeader.innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
+  } else {
+    btnLogin.style.display = 'block';
+    userHeader.style.display = 'none';
+  }
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  if (!currentUser || currentUser.email !== ADMIN_EMAIL) query = query.eq('aprovado', true);
+  if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) { query = query.eq('aprovado', true); }
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
 }
 
 function renderList(list) {
-  document.getElementById('plist').innerHTML = list.map(item => `
+  const container = document.getElementById('plist');
+  container.innerHTML = list.map(item => `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
@@ -210,15 +239,22 @@ function verDetalhes(id) {
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
   document.getElementById('detPhotos').style.display = (ad.fotos && ad.fotos.length > 0) ? 'flex' : 'none';
 
+  const adminControls = document.getElementById('adminControls');
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   document.getElementById('adminControls').style.display = (isRodrigo && !ad.aprovado) ? 'block' : 'none';
   document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
 
-  // BUSCA DINÂMICA DO WHATSAPP (Caso não esteja no join inicial)
-  const num = ad.usuarios?.whatsapp ? ad.usuarios.whatsapp.replace(/\D/g,'') : '';
+  // WHATSAPP COM SAUDAÇÃO
+  const rawNum = ad.usuarios?.whatsapp || '';
+  const cleanNum = rawNum.replace(/\D/g,'');
+  
   document.getElementById('detWppBtn').onclick = () => {
-    if (num && num.length >= 10) window.open(`https://wa.me/55${num}`, '_blank');
-    else alert("Número de contato não disponível. O usuário precisa atualizar o perfil.");
+    if (cleanNum && cleanNum.length >= 10) {
+        const msg = encodeURIComponent(`Olá, vi seu anúncio "${ad.titulo}" no Refinatto Serviços e gostaria de mais informações.`);
+        window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
+    } else {
+        alert("Número de contato não disponível. O usuário precisa atualizar o perfil.");
+    }
   };
   
   document.getElementById('detailOverlay').classList.add('open');
@@ -251,8 +287,25 @@ async function salvarTudo() {
   const wpp = document.getElementById('cadWpp').value;
   if (!wpp || wpp.length < 10) return alert("Insira um WhatsApp válido com DDD.");
 
-  const u = { id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, whatsapp: wpp, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apto: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value };
-  const a = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false };
+  const u = { 
+    id: currentUser.id, 
+    email: currentUser.email, 
+    nome: currentUser.user_metadata.full_name, 
+    whatsapp: wpp, 
+    tipo: tipoUsuario, 
+    bloco: document.getElementById('cadBloco').value, 
+    apto: document.getElementById('cadApto').value, 
+    setor: document.getElementById('cadSetor').value 
+  };
+  
+  const a = { 
+    usuario_id: currentUser.id, 
+    titulo: document.getElementById('cadTitulo').value, 
+    categoria: document.getElementById('cadCat').value, 
+    descricao: document.getElementById('cadDesc').value, 
+    fotos: itemPhotos, 
+    aprovado: false 
+  };
   
   await sb.from('usuarios').upsert(u);
   const { error } = await sb.from('anuncios').insert([a]);
