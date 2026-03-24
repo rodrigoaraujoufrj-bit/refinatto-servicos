@@ -41,7 +41,6 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
@@ -49,7 +48,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .hero { background:var(--forest); padding:32px 20px 20px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
-.hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
 .search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -57,28 +55,25 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
 .pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
 .pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); margin-bottom: 2px; }
-.pcard-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
+.pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* FOTOS NO CADASTRO COM DELETE */
+/* ESTILO DO BOTÃO DE DELETAR FOTO NO CADASTRO */
 .photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 .photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
-.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-/* NAV BOTTOM */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* FORM */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
@@ -112,18 +107,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   <div class="hero" id="heroSection">
     <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
   </div>
-  
-  <div class="search-container">
-    <div class="search-box">
-      <span style="margin-right:10px; opacity:0.5;">🔍</span>
-      <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()">
-    </div>
-  </div>
-
-  <div class="disclaimer">
-    ⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos. A plataforma não se responsabiliza pelas negociações.
-  </div>
-  
+  <div class="search-container"><div class="search-box">🔍 <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()"></div></div>
+  <div class="disclaimer">⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos.</div>
   <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterByCat(this, '')">🏠 Todos</div></div>
   <div class="plist" id="plist"></div>
 </div>
@@ -156,12 +141,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2 style="font-family:'Playfair Display';">Novo Anúncio</h2><button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button></div>
-    
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>Novo Anúncio</h2><button onclick="closeModal('cadOverlay')">✕</button></div>
     <div class="cad-step active" id="step0">
         <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
-            <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
+            <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest);" onclick="setTipo('morador')">Morador</div>
+            <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border);" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
         <div style="display:flex; gap:10px;">
           <div class="field" style="flex:1;"><label>Nome</label><input type="text" id="cadNome"></div>
@@ -173,25 +157,21 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
             <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
           </div>
         </div>
-        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
-        <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor</label><input type="text" id="cadSetor"></div></div>
+        <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
-
     <div class="cad-step" id="step1">
-        <div class="field"><label>Título do anúncio</label><input type="text" id="cadTitulo"></div>
+        <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
         <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
-        <div class="field"><label>Descrição Detalhada</label><textarea id="cadDesc" rows="3"></textarea></div>
+        <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
         <div class="field">
           <label>Fotos (Máx 10)</label>
           <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;">
           <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold); margin-bottom:10px;" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
           <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px;"></div>
         </div>
-        <div style="display:flex; gap:10px;">
-          <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1;" onclick="goStep(0)">Voltar</button>
-          <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Publicar</button>
-        </div>
+        <button class="btn-primary" onclick="salvarTudo()">Enviar para Aprovação</button>
     </div>
   </div>
 </div>
@@ -222,32 +202,27 @@ sb.auth.onAuthStateChange((event, session) => {
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  // Se não for admin, vê só aprovados. Se for Rodrigo, vê TUDO para aprovar.
+  
+  // LOGICA DE ADMIN: Se o email logado for o seu, não filtra por "aprovado=true"
   if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
       query = query.eq('aprovado', true);
   }
-  const { data, error } = await query.order('criado_em', { ascending: false });
+  
+  const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   filterData();
 }
 
 function filterByCat(el, catNome) {
     document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    activeCat = catNome;
-    filterData();
+    el.classList.add('active'); activeCat = catNome; filterData();
 }
 
 function filterData() {
     const term = document.getElementById('searchInput').value.toLowerCase();
     let filtered = currentData;
     if (activeCat) filtered = filtered.filter(i => i.categoria === activeCat);
-    if (term) {
-        filtered = filtered.filter(i => 
-            i.titulo.toLowerCase().includes(term) || 
-            (i.usuarios?.nome && i.usuarios.nome.toLowerCase().includes(term))
-        );
-    }
+    if (term) filtered = filtered.filter(i => i.titulo.toLowerCase().includes(term) || (i.usuarios?.nome && i.usuarios.nome.toLowerCase().includes(term)));
     renderList(filtered);
 }
 
@@ -257,7 +232,6 @@ function renderList(list) {
     const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
     const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
     const loc = item.usuarios?.tipo === 'morador' ? `Bloco ${item.usuarios.bloco} • Apto ${item.usuarios.apartamento}` : item.usuarios?.setor;
-
     return `
     <div class="pcard" onclick="verDetalhes('${item.id}')">
       <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'"></div>
@@ -267,9 +241,8 @@ function renderList(list) {
         ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
       </div>
       ${thumb}
-      <div style="font-size: 16px; color: var(--gold); margin-left: 4px;">➔</div>
     </div>
-  `}).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">Nenhum anúncio encontrado.</p>';
+  `}).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">Nada encontrado.</p>';
 }
 
 function verDetalhes(id) {
@@ -278,7 +251,7 @@ function verDetalhes(id) {
   document.getElementById('detTitle').innerText = ad.titulo;
   const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
-  document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição.";
+  document.getElementById('detDesc').innerText = ad.descricao || "";
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;">`).join('');
   
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -286,10 +259,7 @@ function verDetalhes(id) {
   document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
   
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
-  document.getElementById('detWppBtn').onclick = () => {
-    const msg = encodeURIComponent(`Olá ${ad.usuarios.nome}, vi seu anúncio "${ad.titulo}" no Refinatto.`);
-    window.open(`https://wa.me/55${cleanNum}?text=${msg}`, '_blank');
-  };
+  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${cleanNum}?text=${encodeURIComponent('Olá, vi seu anúncio no Refinatto.')}`);
   document.getElementById('detailOverlay').classList.add('open');
 }
 
@@ -309,15 +279,11 @@ async function carregarMeusAnuncios() {
 }
 
 async function deletarAnuncio(id) {
-  if(confirm("Excluir anúncio?")) {
-    await sb.from('anuncios').delete().eq('id', id);
-    carregarMeusAnuncios(); carregarAnuncios();
-  }
+  if(confirm("Excluir?")) { await sb.from('anuncios').delete().eq('id', id); carregarMeusAnuncios(); carregarAnuncios(); }
 }
 
 function handlePhotos(input) {
   const files = Array.from(input.files);
-  if (itemPhotos.length + files.length > 10) return alert("Máximo 10 fotos.");
   files.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); };
@@ -337,10 +303,7 @@ function renderPhotoGrid() {
 async function salvarTudo() {
   const nome = document.getElementById('cadNome').value;
   const sobrenome = document.getElementById('cadSobrenome').value;
-  const wpp = document.getElementById('cadWpp').value;
-  if (!nome || !sobrenome || !wpp) return alert("Preencha Nome, Sobrenome e WhatsApp.");
-
-  const u = { id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: wpp, tipo: tipoUsuario, bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, foto_url: currentUser.user_metadata.avatar_url };
+  const u = { id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
   await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
   alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads');
@@ -354,8 +317,7 @@ function showTab(tab) {
     if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
-function handleAnunciarClick() { if (!currentUser) loginGoogle(); else { openCad(); } }
-function openCad() { itemPhotos = []; renderPhotoGrid(); goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
+function handleAnunciarClick() { if (!currentUser) loginGoogle(); else { itemPhotos=[]; renderPhotoGrid(); goStep(0); document.getElementById('cadOverlay').classList.add('open'); } }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function setTipo(t) { tipoUsuario = t; document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; }
