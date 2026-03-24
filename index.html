@@ -39,39 +39,33 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
-/* HERO */
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; }
 .hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* NAV BOTTOM (NÍTIDA) */
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1; }
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; cursor: pointer; }
 .pcard-body { flex:1; min-width:0; }
 .pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:4px; }
 
-/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; position: relative; }
 .detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none; }
 .detail-photos img { height: 180px; border-radius: 12px; object-fit: cover; }
 
-/* CATEGORIAS */
 .cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
 .cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
 .cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
@@ -110,7 +104,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageMyAds" style="display:none; padding:20px;">
     <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Meus Anúncios</h2>
     <div id="myAdsList" style="display:flex; flex-direction:column; gap:12px;"></div>
-    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="sb.auth.signOut()">Sair da Conta</button>
+    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="sb.auth.signOut(); location.reload();">Sair da Conta</button>
 </div>
 
 <div class="overlay" id="detailOverlay">
@@ -122,7 +116,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <p id="detDesc" style="line-height:1.6; margin-bottom:20px; font-size:14px;"></p>
     
     <div id="adminControls" style="display:none; margin-bottom: 10px;">
-       <button class="btn-primary" id="btnAprovar" style="background:var(--forest); color:white; margin-bottom: 10px;">Aprovar Anúncio</button>
+       <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white; margin-bottom: 10px;">Aprovar Anúncio</button>
     </div>
     
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
@@ -130,9 +124,9 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="nav-bottom">
-    <div class="nav-item active" onclick="showTab('home')"><span class="nav-icon">🏠</span><span>Início</span></div>
+    <div class="nav-item active" id="navHomeBtn" onclick="showTab('home')"><span class="nav-icon">🏠</span><span>Início</span></div>
     <div class="nav-item" onclick="handleAnunciarClick()"><span class="nav-icon">➕</span><span>Anunciar</span></div>
-    <div class="nav-item" onclick="showTab('myads')"><span class="nav-icon">👤</span><span>Perfil</span></div>
+    <div class="nav-item" id="navUserBtn" onclick="showTab('myads')"><span class="nav-icon">👤</span><span>Perfil</span></div>
 </div>
 
 <div class="overlay" id="cadOverlay">
@@ -176,20 +170,25 @@ async function loginGoogle() {
 
 sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
-  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
-  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
-  if (currentUser) document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
+  const btnLogin = document.getElementById('btnLogin');
+  const userHeader = document.getElementById('userHeader');
+
+  if (currentUser) {
+    btnLogin.style.display = 'none';
+    userHeader.style.display = 'block';
+    userHeader.innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
+  } else {
+    btnLogin.style.display = 'block';
+    userHeader.style.display = 'none';
+  }
   carregarAnuncios();
 });
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
-  
-  // Se não for admin, vê só aprovados. Se for Rodrigo, vê TUDO.
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
       query = query.eq('aprovado', true);
   }
-  
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
@@ -201,12 +200,12 @@ function renderList(list) {
     <div class="pcard" onclick="verDetalhes('${item.id}')">
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
-        <div style="font-size: 12px; color: var(--muted);">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
+        <div style="font-size: 12px; color: var(--muted);">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
         ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
       </div>
       <div style="font-size: 18px; color: var(--gold);">➔</div>
     </div>
-  `).join('');
+  `).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">Nenhum anúncio disponível.</p>';
 }
 
 function verDetalhes(id) {
@@ -218,11 +217,12 @@ function verDetalhes(id) {
   const p = document.getElementById('detPhotos');
   p.innerHTML = (ad.fotos || []).map(f => `<img src="${f}">`).join('');
   
-  // Lógica Admin
   const adminControls = document.getElementById('adminControls');
+  const btnAprovar = document.getElementById('btnAprovarReal');
+  
   if (currentUser && currentUser.email === ADMIN_EMAIL && !ad.aprovado) {
       adminControls.style.display = 'block';
-      document.getElementById('btnAprovar').onclick = () => aprovarAnuncio(ad.id);
+      btnAprovar.onclick = () => aprovarAnuncio(ad.id); // Vinculando a função aqui
   } else {
       adminControls.style.display = 'none';
   }
@@ -233,13 +233,19 @@ function verDetalhes(id) {
 
 async function aprovarAnuncio(id) {
     const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
-    if (!error) { alert("Anúncio aprovado!"); closeModal('detailOverlay'); carregarAnuncios(); }
+    if (!error) { 
+        alert("Anúncio aprovado!"); 
+        closeModal('detailOverlay'); 
+        carregarAnuncios(); 
+    } else {
+        alert("Erro ao aprovar: " + error.message);
+    }
 }
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
   document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
-    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <div style="flex:1">
         <strong>${ad.titulo}</strong><br>
         <span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Aguardando Aprovação'}</span>
@@ -261,6 +267,8 @@ function showTab(tab) {
     document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('heroSection').style.display = tab === 'home' ? 'block' : 'none';
     document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
+    document.getElementById('navHomeBtn').classList.toggle('active', tab === 'home');
+    document.getElementById('navUserBtn').classList.toggle('active', tab === 'myads');
     if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
