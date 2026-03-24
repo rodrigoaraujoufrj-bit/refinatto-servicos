@@ -8,18 +8,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // CONFIGURAÇÃO OFICIAL - Project ID: lrksdcydpsvdqzmxildj
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_iNTDghLkTdaR_7ivvM3Ipw_HHijgbIL' // Sua chave anon
-
+  const SUPABASE_KEY = 'sb_publishable_iNTDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  
   let currentUser = null;
+  let tipoUsuario = 'morador'; // Controle para o formulário
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
-/* ─ ESTILOS PREMIUM DO REFINATTO ─ */
 :root {
   --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
   --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
@@ -27,111 +26,143 @@
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366; --red: #C0392B;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; border-left:1px solid var(--border); border-right:1px solid var(--border); }
+body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 80px; border-left:1px solid var(--border); border-right:1px solid var(--border); }
 
 /* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
-.user-controls { display:flex; align-items:center; gap:12px; }
-.profile-img { width:32px; height:32px; border-radius:50%; border:1.5px solid var(--gold); cursor:pointer; }
 
-/* BOTÕES E UI */
-.btn-offer { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; transition:.2s; }
-.btn-offer:active { transform: scale(0.95); }
+/* MENU INFERIOR (RESTAURADO) */
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: none; justify-content: space-around; padding: 12px 0; z-index: 100; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--muted); cursor: pointer; font-weight: 600; }
+.nav-item.active { color: var(--forest); }
+.nav-icon { font-size: 20px; margin-bottom: 4px; }
+
+/* HERO E LISTAGEM */
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
-.hero h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:18px; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:26px; }
 .hero h1 em { color:var(--gold); font-style:italic; }
-
-/* LISTAGEM */
-.plist { display:flex; flex-direction:column; gap:12px; padding:20px; padding-bottom:100px; }
+.plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
-.pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:4px; }
-.pcard-svc { font-size:12px; color:var(--muted); }
+.pcard-body { flex:1; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
 
-/* MODAIS */
-.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:100; display:none; padding:20px; overflow-y:auto; }
+/* MODAIS E FORMULÁRIO CONDICIONAL */
+.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:200; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
-.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; color:var(--ink); }
+.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; }
 .cad-step { display:none; }
 .cad-step.active { display:block; }
 .field { margin-bottom:15px; }
 .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; font-size:14px; }
+.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
 
-.my-ad-item { border-bottom:1px solid var(--border); padding:12px 0; display:flex; justify-content:space-between; align-items:center; }
-.btn-del { background:var(--red-light); color:var(--red); border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; }
+/* BOTÕES DE OPÇÃO (MORADOR/FUNC) */
+.opt-group { display: flex; gap: 10px; margin-bottom: 20px; }
+.opt-btn { flex: 1; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+.opt-btn.selected { border-color: var(--forest); background: var(--forest-light); color: var(--forest); }
+
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
+.my-ad-item { border-bottom:1px solid var(--border); padding:15px 0; display:flex; justify-content:space-between; align-items:center; }
+.btn-del { color: var(--red); font-weight: 600; background: none; border: none; cursor: pointer; font-size: 12px; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">Refinatto<sup>serviços</sup></div>
-  <div class="user-controls">
-    <button id="btnLogin" class="btn-offer" onclick="loginGoogle()">Entrar</button>
-    <img id="userPhoto" class="profile-img" style="display:none" onclick="openProfile()" title="Meus Anúncios">
-    <button id="btnAnunciar" class="btn-offer" style="display:none" onclick="openCad()">+ Anunciar</button>
-  </div>
+  <button id="btnLogin" class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px;" onclick="loginGoogle()">Entrar</button>
 </div>
 
-<div class="hero">
-  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
-</div>
-
-<div class="plist" id="plist">
-  <p style="text-align:center; padding:40px; color:var(--muted);">Carregando vizinhos...</p>
-</div>
-
-<div class="overlay" id="profileOverlay">
-  <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h2 style="font-family:'Playfair Display';">Meus Anúncios</h2>
-      <button style="background:none; border:none; font-size:24px;" onclick="closeModal('profileOverlay')">✕</button>
+<div id="pageHome">
+    <div class="hero">
+        <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
     </div>
+    <div class="plist" id="plist"></div>
+</div>
+
+<div id="pageMyAds" style="display:none; padding:20px;">
+    <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Gerenciar Anúncios</h2>
     <div id="myAdsList"></div>
-    <button class="btn-offer" style="width:100%; margin-top:24px; background:none; border:1px solid var(--gold); color:var(--gold);" onclick="sb.auth.signOut()">Sair da Conta</button>
-  </div>
+</div>
+
+<div class="nav-bottom" id="navBottom">
+    <div class="nav-item active" onclick="showTab('home')">
+        <span class="nav-icon">🏠</span><span>Início</span>
+    </div>
+    <div class="nav-item" onclick="openCad()">
+        <span class="nav-icon">➕</span><span>Anunciar</span>
+    </div>
+    <div class="nav-item" onclick="showTab('myads')">
+        <span class="nav-icon">👤</span><span>Perfil</span>
+    </div>
 </div>
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h2 style="font-family:'Playfair Display';">Publicar Anúncio</h2>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+      <h2 style="font-family:'Playfair Display';">Novo Anúncio</h2>
       <button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button>
     </div>
 
     <div class="cad-step active" id="step0">
-      <p style="font-size:12px; margin-bottom:15px; color:var(--muted);">Passo 1: Identificação</p>
-      <div class="field"><label>Seu Nome</label><input type="text" id="cadNome" placeholder="Ex: Rodrigo Araújo"></div>
-      <div class="field"><label>WhatsApp (com DDD)</label><input type="tel" id="cadWpp" placeholder="Ex: 21999999999"></div>
-      <div class="field"><label>Bloco/Apto</label><input type="text" id="cadBloco" placeholder="Ex: Bloco 2, Ap 403"></div>
-      <button class="btn-offer" style="width:100%; padding:14px;" onclick="goStep(1)">Próximo Passo</button>
+      <label style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Você é:</label>
+      <div class="opt-group">
+        <div id="optM" class="opt-btn selected" onclick="setTipo('morador')">🏠 Morador</div>
+        <div id="optF" class="opt-btn" onclick="setTipo('funcionario')">👷 Funcionário</div>
+      </div>
+      
+      <div id="fieldsMorador">
+          <div class="field"><label>Bloco</label><input type="text" id="cadBloco" placeholder="Ex: Bloco 1"></div>
+          <div class="field"><label>Apartamento</label><input type="text" id="cadApto" placeholder="Ex: 403"></div>
+      </div>
+      
+      <div id="fieldsFunc" style="display:none;">
+          <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Limpeza / Particular"></div>
+      </div>
+
+      <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+      <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
 
     <div class="cad-step" id="step1">
-      <p style="font-size:12px; margin-bottom:15px; color:var(--muted);">Passo 2: Detalhes</p>
-      <div class="field"><label>Título</label><input type="text" id="cadTitulo" placeholder="Ex: Marmitas Fit"></div>
+      <div class="field"><label>Título</label><input type="text" id="cadTitulo" placeholder="Ex: Manicure e Pedicure"></div>
       <div class="field">
-        <label>Categoria</label>
-        <select id="cadCat">
-          <option value="Gastronomia">🍽️ Gastronomia</option>
-          <option value="Serviços">🛠️ Serviços</option>
-          <option value="Saúde">🩺 Saúde</option>
-          <option value="Beleza">✂️ Beleza</option>
-          <option value="Pets">🐾 Pets</option>
-        </select>
+          <label>Categoria</label>
+          <select id="cadCat">
+              <option value="Gastronomia">Gastronomia</option>
+              <option value="Serviços">Serviços</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Imóveis">Imóveis</option>
+          </select>
       </div>
       <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
       <div style="display:flex; gap:10px;">
-        <button class="btn-offer" style="flex:1; background:#eee;" onclick="goStep(0)">Voltar</button>
-        <button class="btn-offer" style="flex:2;" onclick="salvarTudo()">Publicar Agora</button>
+          <button class="btn-primary" style="background:#eee;" onclick="goStep(0)">Voltar</button>
+          <button class="btn-primary" onclick="salvarTudo()">Publicar</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// --- AUTENTICAÇÃO ---
+// --- LOGICA DE TIPO DE USUÁRIO ---
+function setTipo(t) {
+    tipoUsuario = t;
+    document.getElementById('optM').classList.toggle('selected', t === 'morador');
+    document.getElementById('optF').classList.toggle('selected', t === 'funcionario');
+    document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none';
+    document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none';
+}
+
+// --- NAVEGAÇÃO DE TABS ---
+function showTab(tab) {
+    document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
+    document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
+    if(tab === 'myads') carregarMeusAnuncios();
+}
+
+// --- SUPABASE AUTH ---
 async function loginGoogle() {
   await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
 }
@@ -140,85 +171,78 @@ sb.auth.onAuthStateChange((event, session) => {
   if (session) {
     currentUser = session.user;
     document.getElementById('btnLogin').style.display = 'none';
-    document.getElementById('btnAnunciar').style.display = 'block';
-    document.getElementById('userPhoto').style.display = 'block';
-    document.getElementById('userPhoto').src = currentUser.user_metadata.avatar_url;
-    carregarAnuncios();
-  } else {
-    currentUser = null;
-    document.getElementById('btnLogin').style.display = 'block';
-    document.getElementById('btnAnunciar').style.display = 'none';
-    document.getElementById('userPhoto').style.display = 'none';
+    document.getElementById('navBottom').style.display = 'flex';
     carregarAnuncios();
   }
 });
 
-// --- LISTAGEM PRINCIPAL ---
+// --- OPERAÇÕES DE BANCO ---
 async function carregarAnuncios() {
-  const { data, error } = await sb.from('anuncios').select('*, usuarios(nome, whatsapp, bloco, foto_url)').order('criado_em', { ascending: false });
-  if (!error) renderList(data);
-}
-
-function renderList(list) {
+  const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
   const container = document.getElementById('plist');
-  if (list.length === 0) { container.innerHTML = '<p style="text-align:center; color:var(--muted)">Ainda não há anúncios.</p>'; return; }
-  container.innerHTML = list.map(item => `
+  container.innerHTML = data.map(item => `
     <div class="pcard">
-      <div class="pcard-avatar">👤</div>
       <div class="pcard-body">
         <div class="pcard-name">${item.titulo}</div>
-        <div class="pcard-svc">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || ''}</div>
+        <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
       </div>
-      <button class="btn-offer" style="background:var(--wpp); color:white;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
+      <button class="btn-primary" style="width:auto; background:var(--wpp); color:white; border-radius:8px; padding:8px;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
     </div>
   `).join('');
 }
 
-// --- MEUS ANÚNCIOS (PERFIL) ---
-async function openProfile() {
-  const { data, error } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id);
-  const container = document.getElementById('myAdsList');
-  if (data.length === 0) {
-    container.innerHTML = '<p style="color:var(--muted); padding:20px 0;">Você não possui anúncios ativos.</p>';
-  } else {
+async function carregarMeusAnuncios() {
+    const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id);
+    const container = document.getElementById('myAdsList');
     container.innerHTML = data.map(ad => `
-      <div class="my-ad-item">
-        <div><strong>${ad.titulo}</strong><br><small>${ad.categoria}</small></div>
-        <button class="btn-del" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
-      </div>
-    `).join('');
-  }
-  document.getElementById('profileOverlay').classList.add('open');
+        <div class="my-ad-item">
+            <div><strong>${ad.titulo}</strong><br><small>${ad.categoria}</small></div>
+            <button class="btn-del" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
+        </div>
+    `).join('') || '<p>Você não tem anúncios.</p>';
 }
 
 async function deletarAnuncio(id) {
-  if (confirm("Deseja remover este anúncio permanentemente?")) {
-    const { error } = await sb.from('anuncios').delete().eq('id', id);
-    if (!error) {
-      alert("Anúncio removido!");
-      openProfile(); 
-      carregarAnuncios();
+    if(confirm("Deseja excluir este anúncio?")) {
+        await sb.from('anuncios').delete().eq('id', id);
+        carregarMeusAnuncios();
+        carregarAnuncios();
     }
-  }
 }
 
-// --- SALVAMENTO ---
 async function salvarTudo() {
-  const userPayload = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value, whatsapp: document.getElementById('cadWpp').value, bloco: document.getElementById('cadBloco').value, foto_url: currentUser.user_metadata.avatar_url };
-  const adPayload = { usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value };
+    const nome = currentUser.user_metadata.full_name;
+    const email = currentUser.email;
+    const whatsapp = document.getElementById('cadWpp').value;
+    
+    // Payload do Usuário respeitando o tipo
+    const userPayload = { 
+        id: currentUser.id, 
+        email, 
+        nome, 
+        whatsapp,
+        tipo: tipoUsuario,
+        bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null,
+        apto: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null,
+        setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null
+    };
 
-  const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
-  const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
+    const adPayload = {
+        usuario_id: currentUser.id,
+        titulo: document.getElementById('cadTitulo').value,
+        categoria: document.getElementById('cadCat').value,
+        descricao: document.getElementById('cadDesc').value
+    };
 
-  if (!err1 && !err2) {
-    alert("Anúncio publicado!");
+    await sb.from('usuarios').upsert(userPayload);
+    await sb.from('anuncios').insert([adPayload]);
+
+    alert("Publicado!");
     closeModal('cadOverlay');
     carregarAnuncios();
-  } else {
-    alert("Erro ao publicar. Verifique os campos.");
-  }
 }
 
+// --- UTILITÁRIOS UI ---
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
