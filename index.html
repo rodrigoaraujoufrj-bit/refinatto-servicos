@@ -23,7 +23,6 @@
   --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
   --forest: #1E3A2F; --forest-mid: #2E5943; --forest-light: #D4E8DC;
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366;
-  --red: #C0392B; --red-light: #FDECEA;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; border-left:1px solid var(--border); border-right:1px solid var(--border); }
@@ -38,18 +37,10 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .hero { background:var(--forest); padding:32px 20px 28px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:18px; }
 .hero h1 em { color:var(--gold); font-style:italic; }
-.search-wrap { display:flex; background:white; border-radius:12px; overflow:hidden; }
-.search-wrap input { flex:1; border:none; padding:13px 16px; outline:none; font-size:14px; }
-.search-wrap button { background:var(--gold); border:none; padding:0 18px; }
-
-/* CATEGORIAS */
-.section { padding:24px 20px 0; }
-.sec-title { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:14px; display:block; }
-.cats { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; }
-.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
-.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 
 /* LISTAGEM */
+.section { padding:24px 20px 0; }
+.sec-title { font-family:'Playfair Display',serif; font-size:19px; margin-bottom:14px; display:block; }
 .plist { display:flex; flex-direction:column; gap:12px; padding:20px 20px 100px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
 .pcard-avatar { width:48px; height:48px; background:#eee; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; overflow:hidden; }
@@ -66,7 +57,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .cad-step.active { display:block; }
 .field { margin-bottom:15px; }
 .field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
+.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; font-size:14px; }
 .btn-full { width:100%; padding:14px; border-radius:12px; border:none; font-weight:700; cursor:pointer; margin-top:10px; }
 </style>
 </head>
@@ -81,35 +72,23 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="hero">
-  <h1>Anúncios dos seus <em>vizinhos</em></h1>
-  <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="O que procura?" oninput="applyFilters()">
-    <button>🔍</button>
-  </div>
+  <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
 </div>
 
 <div class="section">
-  <span class="sec-title">Categorias</span>
-  <div class="cats">
-    <div class="cat-pill active" onclick="filterCat(this, '')">🏠 Todos</div>
-    <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
-    <div class="cat-pill" onclick="filterCat(this, 'Saúde')">🩺 Saúde</div>
-    <div class="cat-pill" onclick="filterCat(this, 'Beleza')">✂️ Beleza</div>
-    <div class="cat-pill" onclick="filterCat(this, 'Serviços')">🛠️ Serviços</div>
-    <div class="cat-pill" onclick="filterCat(this, 'Pets')">🐾 Pets</div>
-  </div>
+  <span class="sec-title">Recentes</span>
+  <div class="plist" id="plist"></div>
 </div>
-
-<div class="plist" id="plist"></div>
 
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:20px;">
       <h2 style="font-family:'Playfair Display';">Novo Anúncio</h2>
-      <button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">×</button>
+      <button style="background:none; border:none; font-size:24px;" onclick="closeModal('cadOverlay')">✕</button>
     </div>
 
     <div class="cad-step active" id="step0">
+      <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 1: Seus dados de contacto</p>
       <div class="field">
         <label>Seu Nome</label>
         <input type="text" id="cadNome" placeholder="Ex: Rodrigo Araújo">
@@ -119,13 +98,14 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         <input type="tel" id="cadWpp" placeholder="Ex: 21999999999">
       </div>
       <div class="field">
-        <label>Bloco/Unidade</label>
+        <label>Bloco/Apto</label>
         <input type="text" id="cadBloco" placeholder="Ex: Bloco 2, Ap 403">
       </div>
       <button class="btn-full" style="background:var(--gold); color:white;" onclick="goStep(1)">Próximo Passo</button>
     </div>
 
     <div class="cad-step" id="step1">
+      <p style="font-size:13px; margin-bottom:15px; color:var(--muted);">Passo 2: O que você oferece?</p>
       <div class="field">
         <label>Título do Anúncio</label>
         <input type="text" id="cadTitulo" placeholder="Ex: Bolos de Pote">
@@ -133,27 +113,27 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       <div class="field">
         <label>Categoria</label>
         <select id="cadCat">
-          <option value="Gastronomia">Gastronomia</option>
-          <option value="Saúde">Saúde</option>
-          <option value="Beleza">Beleza</option>
-          <option value="Serviços">Serviços</option>
-          <option value="Pets">Pets</option>
+          <option value="Gastronomia">🍽️ Gastronomia</option>
+          <option value="Serviços">🛠️ Serviços</option>
+          <option value="Saúde">🩺 Saúde</option>
+          <option value="Beleza">✂️ Beleza</option>
+          <option value="Outros">✨ Outros</option>
         </select>
       </div>
       <div class="field">
         <label>Descrição</label>
-        <textarea id="cadDesc" rows="3" placeholder="Detalhes..."></textarea>
+        <textarea id="cadDesc" rows="3" placeholder="Detalhes do seu serviço..."></textarea>
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn-full" style="background:#eee;" onclick="goStep(0)">Voltar</button>
-        <button class="btn-full" style="background:var(--forest); color:white;" onclick="salvarTudo()">Publicar</button>
+        <button class="btn-full" style="background:var(--forest); color:white;" onclick="salvarTudo()">Publicar Agora</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// --- AUTH ---
+// --- AUTENTICAÇÃO ---
 async function loginGoogle() {
   await sb.auth.signInWithOAuth({ 
     provider: 'google', 
@@ -170,15 +150,14 @@ sb.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// --- DADOS COM RELACIONAMENTO ---
-let currentData = [];
+// --- CARREGAR ANÚNCIOS (COM DADOS DO VIZINHO) ---
 async function carregarAnuncios() {
   const { data, error } = await sb
     .from('anuncios')
     .select('*, usuarios(nome, whatsapp, bloco, foto_url)')
     .order('criado_em', { ascending: false });
 
-  if (!error) { currentData = data; renderList(data); }
+  if (!error) renderList(data);
 }
 
 function renderList(list) {
@@ -200,11 +179,13 @@ function renderList(list) {
   });
 }
 
-// --- SALVAMENTO CORRIGIDO ---
+// --- SALVAMENTO CONSOLIDADO ---
 async function salvarTudo() {
-  const { id } = currentUser;
+  const { id, email } = currentUser;
+
   const userPayload = {
-    id,
+    id: id,
+    email: email, // Resolve o erro de NOT NULL do e-mail
     nome: document.getElementById('cadNome').value,
     whatsapp: document.getElementById('cadWpp').value,
     bloco: document.getElementById('cadBloco').value
@@ -217,40 +198,25 @@ async function salvarTudo() {
     descricao: document.getElementById('cadDesc').value
   };
 
-  // 1. Atualiza Perfil
+  // 1. Atualizar Perfil na tabela 'usuarios'
   const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
   if (err1) return alert("Erro no perfil: " + err1.message);
 
-  // 2. Insere Anúncio
+  // 2. Inserir Anúncio na tabela 'anuncios'
   const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
   if (err2) return alert("Erro no anúncio: " + err2.message);
 
-  alert("Publicado!");
+  alert("Anúncio publicado com sucesso!");
   closeModal('cadOverlay');
   carregarAnuncios();
 }
 
-// --- UI ---
+// --- NAVEGAÇÃO UI ---
 function goStep(n) {
   document.querySelectorAll('.cad-step').forEach((s, idx) => s.classList.toggle('active', idx === n));
 }
 function openCad() { goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-function filterCat(el, cat) {
-  document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  let filtered = currentData;
-  if (cat) filtered = filtered.filter(i => i.categoria === cat);
-  if (q) filtered = filtered.filter(i => i.titulo.toLowerCase().includes(q));
-  renderList(filtered);
-}
-
-function applyFilters() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  renderList(currentData.filter(i => i.titulo.toLowerCase().includes(q)));
-}
 
 window.onload = carregarAnuncios;
 </script>
