@@ -235,11 +235,11 @@ function verDetalhes(id) {
       adminControls.style.display = 'none';
   }
 
-  // CORREÇÃO DO WHATSAPP: Captura o número do usuário dono do anúncio
+  // CORREÇÃO DO WHATSAPP: Captura o número limpo e concatena com 55
   const wppNum = ad.usuarios?.whatsapp ? ad.usuarios.whatsapp.replace(/\D/g,'') : '';
   document.getElementById('detWppBtn').onclick = () => {
-    if (wppNum) { window.open(`https://wa.me/55${wppNum}`, '_blank'); }
-    else { alert("Número de contato não disponível."); }
+    if (wppNum && wppNum.length >= 10) { window.open(`https://wa.me/55${wppNum}`, '_blank'); }
+    else { alert("Número de contato não disponível ou incompleto."); }
   };
   
   document.getElementById('detailOverlay').classList.add('open');
@@ -248,7 +248,7 @@ function verDetalhes(id) {
 async function aprovarAnuncio(id) {
     const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
     if (!error) { 
-        alert("Anúncio aprovado!"); 
+        alert("Anúncio aprovado com sucesso!"); 
         closeModal('detailOverlay'); 
         carregarAnuncios(); 
         if (activeTab === 'myads') carregarMeusAnuncios();
@@ -284,7 +284,7 @@ async function deletarAnuncio(id) {
 
 async function salvarTudo() {
   const wppVal = document.getElementById('cadWpp').value;
-  if (!wppVal) return alert("Por favor, insira seu WhatsApp.");
+  if (!wppVal || wppVal.length < 10) return alert("Por favor, insira um WhatsApp válido com DDD.");
 
   const userPayload = { 
     id: currentUser.id, email: currentUser.email, nome: currentUser.user_metadata.full_name, 
