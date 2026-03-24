@@ -8,21 +8,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // CONFIGURAÇÃO OFICIAL
   const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
-  const SUPABASE_KEY = 'SUA_CHAVE_PUBLISHABLE_AQUI' // Cole a chave de image_fe4e46.png
+  const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  
   let currentUser = null;
   let tipoUsuario = 'morador';
   let currentData = [];
-  let itemPhotos = []; // Armazena as fotos do anúncio
+  let itemPhotos = [];
+  let activeTab = 'home';
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
-/* CSS UNIFICADO: PREMIUM + BARRA FIXA */
+/* CSS PREMIUM RESTAURADO */
 :root {
   --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
   --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
@@ -30,58 +31,61 @@
   --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366; --red: #C0392B;
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 95px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
+body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
 /* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
+.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer; }
 
-/* NAV BOTTOM FIXA */
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
-.nav-item.active { color: var(--gold); }
-.nav-icon { font-size: 20px; margin-bottom: 4px; }
+/* MENSAGENS */
+.disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* MODAL OVERLAY */
-.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:200; display:none; padding:20px; overflow-y:auto; }
-.overlay.open { display:block; }
-.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; }
-.cad-step { display:none; }
-.cad-step.active { display:block; }
-
-/* FORM FIELDS */
-.field { margin-bottom:15px; }
-.field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-.field input, .field select, .field textarea { width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family:inherit; outline:none; font-size:14px; }
-
-/* GRID DE FOTOS */
-.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-.photo-item { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; }
-.photo-item img { width: 100%; height: 100%; object-fit: cover; }
-.photo-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; }
-
-/* CATEGORIAS */
-.cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
-.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
-.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
-
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
-.disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 11px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); }
+/* LISTAGEM */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; display:flex; gap:12px; align-items:center; }
 .pcard-body { flex:1; min-width:0; }
 .pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
+
+/* NAV BOTTOM FIXA */
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 0.5; }
+.nav-item.active { color: var(--gold); opacity: 1; }
+.nav-icon { font-size: 20px; margin-bottom: 2px; }
+
+/* MODAL E PASSOS */
+.overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
+.overlay.open { display:block; }
+.modal-card { background:var(--paper); border-radius:24px; padding:24px; margin-top:20px; }
+.cad-step { display:none; }
+.cad-step.active { display:block; }
+.field { margin-bottom:15px; }
+.field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+.field input, .field select, .field textarea { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; outline:none; }
+
+/* CATEGORIAS */
+.cats { display:flex; gap:8px; overflow-x:auto; padding:20px 20px 10px; scrollbar-width:none; }
+.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:7px 16px; font-size:12px; cursor:pointer; }
+.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
+
+/* FOTOS */
+.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.photo-item { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:12px; padding:15px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">Refinatto<sup>serviços</sup></div>
-  <button id="btnLogin" class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px;" onclick="loginGoogle()">Entrar</button>
+  <button id="btnLogin" class="btn-login-top" onclick="loginGoogle()">ENTRAR</button>
+  <div id="userHeader" style="display:none; color:var(--gold); font-size:12px; font-weight:600;">Olá!</div>
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Aviso:</strong> A plataforma é um canal entre vizinhos. Não nos responsabilizamos pelas negociações.
+  ⚠️ <strong>Atenção:</strong> O Refinatto Serviços é um canal entre vizinhos. A plataforma não se responsabiliza pelas negociações ou qualidade dos serviços.
 </div>
 
 <div id="pageHome">
@@ -92,13 +96,13 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         <div class="cat-pill" onclick="filterCat(this, 'Gastronomia')">🍽️ Gastronomia</div>
         <div class="cat-pill" onclick="filterCat(this, 'Reformas')">🏗️ Reformas</div>
         <div class="cat-pill" onclick="filterCat(this, 'Automotivo')">🔧 Automotivo</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
         <div class="cat-pill" onclick="filterCat(this, 'Pets')">🐾 Pets</div>
         <div class="cat-pill" onclick="filterCat(this, 'Aulas')">📚 Aulas</div>
         <div class="cat-pill" onclick="filterCat(this, 'Festas')">🎈 Festas</div>
-        <div class="cat-pill" onclick="filterCat(this, 'Vagas')">🅿️ Vagas</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Imóveis')">🔑 Imóveis</div>
         <div class="cat-pill" onclick="filterCat(this, 'Transporte')">🚕 Transporte</div>
         <div class="cat-pill" onclick="filterCat(this, 'Desapega')">🏷️ Desapega</div>
+        <div class="cat-pill" onclick="filterCat(this, 'Vagas')">🅿️ Vagas</div>
         <div class="cat-pill" onclick="filterCat(this, 'Doações')">🤝 Doações</div>
         <div class="cat-pill" onclick="filterCat(this, 'Atividades')">🏃 Atividades</div>
         <div class="cat-pill" onclick="filterCat(this, 'Estética Auto')">🚿 Estética Auto</div>
@@ -112,6 +116,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageMyAds" style="display:none; padding:20px;">
     <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Meus Anúncios</h2>
     <div id="myAdsList" style="display:flex; flex-direction:column; gap:12px;"></div>
+    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="sb.auth.signOut()">Sair da Conta</button>
 </div>
 
 <div class="nav-bottom">
@@ -135,187 +140,180 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
     <div class="cad-step active" id="step0">
       <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest);" onclick="setTipo('morador')">🏠 Morador</button>
-        <button id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1px solid var(--border);" onclick="setTipo('funcionario')">👷 Funcionário</button>
+        <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
+        <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
       </div>
       
       <div id="fieldsMorador">
         <div style="display:flex; gap:10px;">
-          <div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco" placeholder="Ex: 1"></div>
-          <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto" placeholder="Ex: 403"></div>
+          <div class="field" style="flex:1;"><label>Bloco</label><input type="text" id="cadBloco"></div>
+          <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
         </div>
       </div>
       <div id="fieldsFunc" style="display:none;">
-        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Portaria"></div>
+        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div>
       </div>
       <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
       <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
 
     <div class="cad-step" id="step1">
-      <div class="field"><label>Título</label><input type="text" id="cadTitulo" placeholder="Ex: Marmitas Caseiras"></div>
+      <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
       <div class="field">
         <label>Categoria</label>
         <select id="cadCat">
-          <option value="Gastronomia">Gastronomia</option>
-          <option value="Saúde">Saúde</option>
-          <option value="Serviços">Serviços</option>
-          <option value="Imóveis">Imóveis</option>
-          <option value="Outros">Outros</option>
+            <option value="Gastronomia">Gastronomia</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Serviços">Serviços</option>
+            <option value="Imóveis">Imóveis</option>
         </select>
       </div>
-      <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3" placeholder="Detalhes do seu serviço..."></textarea></div>
+      <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="3"></textarea></div>
       
       <div class="field">
-        <label>Fotos (até 10)</label>
+        <label>Fotos (Máx 10)</label>
         <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;">
-        <button class="btn-primary" style="background:var(--paper); border:1px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📷 Selecionar Fotos</button>
+        <button class="btn-primary" style="background:white; border:1px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
         <div class="photo-grid" id="photoGrid"></div>
       </div>
 
       <div style="display:flex; gap:10px;">
         <button class="btn-primary" style="background:#eee; flex:1;" onclick="goStep(0)">Voltar</button>
-        <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Publicar Anúncio</button>
+        <button class="btn-primary" style="flex:2;" onclick="salvarTudo()">Publicar</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// --- LÓGICA DE FOTOS ---
-function handlePhotos(input) {
-    const files = Array.from(input.files);
-    if (itemPhotos.length + files.length > 10) return alert("Máximo de 10 fotos permitido.");
-    
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            itemPhotos.push(e.target.result);
-            renderPhotoGrid();
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-function renderPhotoGrid() {
-    const grid = document.getElementById('photoGrid');
-    grid.innerHTML = itemPhotos.map((src, i) => `
-        <div class="photo-item">
-            <img src="${src}">
-            <button class="photo-del" onclick="itemPhotos.splice(${i}, 1); renderPhotoGrid();">✕</button>
-        </div>
-    `).join('');
-}
-
-// --- NAVEGAÇÃO E TIPO ---
-function setTipo(t) {
-    tipoUsuario = t;
-    document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white';
-    document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white';
-    document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none';
-    document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none';
-}
-
-function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad(); }
-
-function showTab(tab) {
-    document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
-    document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
-    if(tab === 'myads' && currentUser) carregarMeusAnuncios();
-}
-
-// --- AUTH ---
+// --- LÓGICA DE LOGIN ---
 async function loginGoogle() {
-    await sb.auth.signInWithOAuth({ 
-        provider: 'google', 
-        options: { redirectTo: window.location.origin + window.location.pathname } 
-    });
+  const { error } = await sb.auth.signInWithOAuth({ 
+    provider: 'google', 
+    options: { redirectTo: window.location.origin + window.location.pathname } 
+  });
 }
 
+// Escutador de Autenticação Robusto
 sb.auth.onAuthStateChange((event, session) => {
-    currentUser = session?.user || null;
-    document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
+  currentUser = session?.user || null;
+  if (currentUser) {
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('userHeader').style.display = 'block';
+    document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name || "Vizinho");
     carregarAnuncios();
+  } else {
+    document.getElementById('btnLogin').style.display = 'block';
+    document.getElementById('userHeader').style.display = 'none';
+    carregarAnuncios();
+  }
 });
 
-// --- OPERAÇÕES SUPABASE ---
+// --- LISTAGEM E DADOS ---
 async function carregarAnuncios() {
-    const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
-    currentData = data || [];
-    renderList(currentData);
+  const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
+  currentData = data || [];
+  renderList(currentData);
 }
 
 function renderList(list) {
-    document.getElementById('plist').innerHTML = list.map(item => `
-        <div class="pcard">
-            <div class="pcard-avatar">👤</div>
-            <div class="pcard-body">
-                <div class="pcard-name">${item.titulo}</div>
-                <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
-            </div>
-            <button class="btn-primary" style="width:auto; background:var(--wpp); padding:8px 12px;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
-        </div>
-    `).join('');
+  document.getElementById('plist').innerHTML = list.map(item => `
+    <div class="pcard">
+      <div class="pcard-body">
+        <div class="pcard-name">${item.titulo}</div>
+        <div style="font-size:12px; color:var(--muted)">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.bloco || item.usuarios?.setor || ''}</div>
+      </div>
+      <button class="btn-primary" style="width:auto; background:var(--wpp); color:white; padding:8px 12px;" onclick="window.open('https://wa.me/55${item.usuarios?.whatsapp}')">💬</button>
+    </div>
+  `).join('');
+}
+
+// --- SALVAMENTO ---
+async function salvarTudo() {
+  if (!currentUser) return loginGoogle();
+  
+  const userPayload = { 
+    id: currentUser.id, 
+    email: currentUser.email, 
+    nome: currentUser.user_metadata.full_name,
+    whatsapp: document.getElementById('cadWpp').value,
+    tipo: tipoUsuario,
+    bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null,
+    apto: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null,
+    setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null
+  };
+
+  const adPayload = {
+    usuario_id: currentUser.id,
+    titulo: document.getElementById('cadTitulo').value,
+    categoria: document.getElementById('cadCat').value,
+    descricao: document.getElementById('cadDesc').value,
+    fotos: itemPhotos 
+  };
+
+  const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
+  const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
+
+  if (!err1 && !err2) {
+    alert("Publicado!"); closeModal('cadOverlay'); carregarAnuncios();
+  } else {
+    alert("Erro ao salvar. Verifique se a coluna 'fotos' existe na tabela anuncios.");
+  }
+}
+
+// --- UI E GESTÃO ---
+function setTipo(t) {
+  tipoUsuario = t;
+  document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white';
+  document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white';
+  document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none';
+  document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none';
+}
+
+function showTab(tab) {
+  document.getElementById('pageHome').style.display = tab === 'home' ? 'block' : 'none';
+  document.getElementById('pageMyAds').style.display = tab === 'myads' ? 'block' : 'none';
+  document.getElementById('navHome').classList.toggle('active', tab === 'home');
+  document.getElementById('navUser').classList.toggle('active', tab === 'myads');
+  if(tab === 'myads' && currentUser) carregarMeusAnuncios();
 }
 
 async function carregarMeusAnuncios() {
-    const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id);
-    document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
-        <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <div><strong>${ad.titulo}</strong></div>
-            <button style="color:var(--red); background:none; border:none; font-weight:600;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
-        </div>
-    `).join('') || '<p>Você não tem anúncios.</p>';
+  const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id);
+  document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
+    <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between;">
+      <strong>${ad.titulo}</strong>
+      <button style="color:var(--red); border:none; background:none; font-weight:700;" onclick="deletarAnuncio('${ad.id}')">Excluir</button>
+    </div>
+  `).join('') || '<p>Você não tem anúncios.</p>';
 }
 
 async function deletarAnuncio(id) {
-    if(confirm("Deseja excluir?")) {
-        await sb.from('anuncios').delete().eq('id', id);
-        carregarMeusAnuncios(); carregarAnuncios();
-    }
+  if(confirm("Deseja excluir?")) {
+    await sb.from('anuncios').delete().eq('id', id);
+    carregarMeusAnuncios(); carregarAnuncios();
+  }
 }
 
-async function salvarTudo() {
-    if(!currentUser) return loginGoogle();
-    
-    // 1. Grava no Perfil (Tabela 'usuarios')
-    const userPayload = { 
-        id: currentUser.id, 
-        email: currentUser.email, // Obrigatório para evitar erro 'null'
-        nome: currentUser.user_metadata.full_name,
-        whatsapp: document.getElementById('cadWpp').value,
-        tipo: tipoUsuario,
-        bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null,
-        apto: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null,
-        setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null
-    };
-
-    // 2. Grava o Anúncio (Tabela 'anuncios')
-    const adPayload = {
-        usuario_id: currentUser.id,
-        titulo: document.getElementById('cadTitulo').value,
-        categoria: document.getElementById('cadCat').value,
-        descricao: document.getElementById('cadDesc').value,
-        fotos: itemPhotos // Certifique-se de que a coluna fotos existe
-    };
-
-    const { error: err1 } = await sb.from('usuarios').upsert(userPayload);
-    const { error: err2 } = await sb.from('anuncios').insert([adPayload]);
-
-    if (!err1 && !err2) {
-        alert("Publicado!"); closeModal('cadOverlay'); carregarAnuncios();
-    } else {
-        console.error(err1, err2); alert("Erro ao salvar. Verifique o banco.");
-    }
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); };
+    reader.readAsDataURL(file);
+  });
 }
 
-// --- UI HELPERS ---
+function renderPhotoGrid() {
+  document.getElementById('photoGrid').innerHTML = itemPhotos.map(src => `<div class="photo-item"><img src="${src}"></div>`).join('');
+}
+
+function handleAnunciarClick() { if (!currentUser) loginGoogle(); else openCad(); }
 function filterCat(el, cat) {
-    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData);
+  document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderList(cat ? currentData.filter(i => i.categoria === cat) : currentData);
 }
-
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
 function openCad() { itemPhotos = []; renderPhotoGrid(); goStep(0); document.getElementById('cadOverlay').classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
