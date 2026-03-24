@@ -13,6 +13,7 @@
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
+  // E-MAIL DO ADMINISTRADOR (Certifique-se que é exatamente o e-mail do seu login Google)
   const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
   let currentUser = null;
   let tipoUsuario = 'morador';
@@ -50,8 +51,8 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
+.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
@@ -91,7 +92,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div class="disclaimer">
-  ⚠️ <strong>Administração:</strong> Novos anúncios aguardam aprovação para serem publicados na vitrine principal.
+  ⚠️ <strong>Administração:</strong> Novos anúncios aguardam aprovação para serem publicados na vitrine principal. O Refinatto Serviços atua apenas como um mural de classificados entre vizinhos. A plataforma não possui vínculo com os anunciantes e não se responsabiliza por qualquer comercialização, pagamentos ou pela qualidade dos serviços e produtos ofertados.
 </div>
 
 <div id="pageHome">
@@ -193,9 +194,12 @@ sb.auth.onAuthStateChange((event, session) => {
 
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
+  
+  // ADMIN vê tudo. Morador vê só aprovados.
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
       query = query.eq('aprovado', true);
   }
+  
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   renderList(currentData);
@@ -227,7 +231,8 @@ function verDetalhes(id) {
   const adminControls = document.getElementById('adminControls');
   const btnAprovar = document.getElementById('btnAprovarReal');
   
-  if (currentUser && currentUser.email === ADMIN_EMAIL && !ad.aprovado) {
+  // CORREÇÃO: Verifica se você é o admin para mostrar o botão
+  if (currentUser && currentUser.email === ADMIN_EMAIL && ad.aprovado === false) {
       adminControls.style.display = 'block';
       btnAprovar.onclick = () => aprovarAnuncio(ad.id);
   } else {
@@ -251,8 +256,7 @@ async function aprovarAnuncio(id) {
 
 async function carregarMeusAnuncios() {
   const { data } = await sb.from('anuncios').select('*').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  const listContainer = document.getElementById('myAdsList');
-  listContainer.innerHTML = (data || []).map(ad => `
+  document.getElementById('myAdsList').innerHTML = (data || []).map(ad => `
     <div style="background:white; padding:15px; border-radius:12px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <div style="flex:1">
         <strong>${ad.titulo}</strong><br>
@@ -267,11 +271,8 @@ async function deletarAnuncio(id) {
   if(confirm("Deseja excluir permanentemente?")) {
     const { error } = await sb.from('anuncios').delete().eq('id', id);
     if (!error) {
-        alert("Anúncio removido com sucesso!");
-        carregarMeusAnuncios(); 
-        carregarAnuncios();
-    } else {
-        alert("Erro ao excluir: " + error.message);
+        alert("Anúncio removido!");
+        carregarMeusAnuncios(); carregarAnuncios();
     }
   }
 }
