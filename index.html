@@ -69,18 +69,15 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
-.field { margin-bottom: 16px; }
-.field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
 
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; transition: 0.2s;}
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; }
 .btn-share { width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; font-size: 13px; margin-bottom: 12px; display: flex; align-items:center; justify-content:center; gap:8px;}
 
 .photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -109,7 +106,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageHome">
   <div class="hero" id="heroSection"><h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1></div>
   <div class="search-container"><div class="search-box">🔍 <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()"></div></div>
-  <div class="disclaimer">⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos.</div>
+  <div class="disclaimer">⚠️ <strong>Aviso:</strong> Canal exclusivo para moradores e funcionários.</div>
   <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterByCat(this, '')">🏠 Todos</div></div>
   <div class="plist" id="plist"></div>
 </div>
@@ -279,7 +276,11 @@ function verDetalhes(id) {
   } else { document.getElementById('adminControls').style.display = 'none'; }
   
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${cleanNum}?text=${encodeURIComponent('Olá '+ad.usuarios.nome+', vi seu anúncio de "'+ad.titulo+'" no Refinatto.')}`);
+  document.getElementById('detWppBtn').onclick = () => {
+    const nomeVend = ad.usuarios?.nome || 'Vizinho';
+    const msgZap = encodeURIComponent(`Olá ${nomeVend}, vi seu anúncio de "${ad.titulo}" no Refinatto e gostaria de mais informações.`);
+    window.open(`https://wa.me/55${cleanNum}?text=${msgZap}`);
+  };
   document.getElementById('detailOverlay').classList.add('open');
 }
 
