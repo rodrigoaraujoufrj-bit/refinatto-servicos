@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Refinatto — Serviços & Anúncios</title>
 
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23141210%22/><text y=%22.9em%22 x=%2250%%22 font-family=%22serif%22 font-weight=%22bold%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22%23B8862A%22>R</text></svg>">
+<meta name="theme-color" content="#141210">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -41,7 +44,6 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
@@ -49,6 +51,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .hero { background:var(--forest); padding:32px 20px 20px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
+.hero h1 em { font-style:italic; color:var(--gold); font-weight: 400; }
 
 .search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -56,52 +59,41 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .disclaimer { background: var(--gold-pale); padding: 12px 20px; font-size: 10px; color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-light); line-height: 1.4; }
 
-/* CARDS LISTA */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
-.pcard:active { transform: scale(0.98); }
 .pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
 .pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); margin-bottom: 2px; }
-.pcard-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
+.pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* NAV BOTTOM */
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; opacity: 1 !important; transition: 0.2s;}
-.nav-item:active { transform: scale(0.95); opacity: 0.8 !important;}
+.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; transition: 0.2s; }
 .nav-item.active { color: var(--gold); }
 .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(20,18,16,0.95); z-index:2000; display:none; padding:20px; overflow-y:auto; }
 .overlay.open { display:block; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; margin-top:10px; position: relative; }
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 .field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
-.cad-step { display: none; }
-.cad-step.active { display: block; }
 
-.detail-photos { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
-.detail-photos img { height: 180px; border-radius: 16px; object-fit: cover; }
-
-.cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
-.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
-.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
-
-/* BOTOES GERAIS */
 .btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; transition: 0.2s;}
-.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
-
-/* BOTAO COMPARTILHAR */
 .btn-share { width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; font-size: 13px; margin-bottom: 12px; display: flex; align-items:center; justify-content:center; gap:8px;}
 
-/* STATUS E MODERAÇÃO */
+.photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
+.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
 .status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
 .status-pending { background: #FFF3CD; color: #856404; }
 .status-approved { background: #D4EDDA; color: #155724; }
+
+.cats { display:flex; gap:8px; overflow-x:auto; padding:10px 20px 20px; scrollbar-width:none; }
+.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; font-weight: 500; }
+.cat-pill.active { background:var(--forest); color:white; border-color:var(--forest); }
 </style>
 </head>
 <body>
@@ -115,9 +107,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <div id="pageHome">
-  <div class="hero" id="heroSection">
-    <h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1>
-  </div>
+  <div class="hero" id="heroSection"><h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1></div>
   <div class="search-container"><div class="search-box">🔍 <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()"></div></div>
   <div class="disclaimer">⚠️ <strong>Aviso:</strong> Canal exclusivo para vizinhos.</div>
   <div class="cats" id="catBar"><div class="cat-pill active" onclick="filterByCat(this, '')">🏠 Todos</div></div>
@@ -126,32 +116,29 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 <div id="pageMyAds" style="display:none; padding:20px;">
     <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Painel de Controle</h2>
-    
     <div id="adminPanel" style="display:none; margin-bottom: 30px;">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px;">Pendentes de Aprovação (Geral)</h3>
+        <h3 style="font-size: 10px; text-transform: uppercase; color: var(--gold); letter-spacing:1px; margin-bottom: 10px;">Pendentes de Aprovação (Geral)</h3>
         <div id="pendingList" style="display:flex; flex-direction:column; gap:10px;"></div>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
     </div>
-
-    <h3 style="font-size: 12px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Meus Anúncios</h3>
+    <h3 style="font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing:1px; margin-bottom: 10px;">Meus Anúncios</h3>
     <div id="myAdsList" style="display:flex; flex-direction:column; gap:10px;"></div>
-    
     <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="logout()">Sair da Conta</button>
 </div>
 
 <div class="overlay" id="detailOverlay">
   <div class="modal-card">
-    <button style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px;" onclick="closeModal('detailOverlay')">✕</button>
+    <button style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px;" id="btnCloseDetail">✕</button>
     <h2 id="detTitle" style="font-family:'Playfair Display', serif; margin-bottom:10px;"></h2>
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
-    <div class="detail-photos" id="detPhotos"></div>
+    <div class="detail-photos" id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444;"></p>
     
     <button class="btn-share" id="detShareBtn">🔗 Compartilhar anúncio</button>
 
     <div id="adminControls" style="display:none; padding:15px; background:var(--gold-pale); border-radius:16px; margin-bottom:15px; border:1px solid var(--gold-light);">
        <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
-       <button class="btn-primary" id="btnAdminDelete" style="background:var(--red); color:white; font-size: 11px; padding: 10px;">🗑️ Excluir permanentemente</button>
+       <button class="btn-primary" id="btnAdminDelete" style="background:var(--red); color:white; font-size: 11px;">🗑️ Excluir permanentemente</button>
     </div>
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
@@ -219,9 +206,7 @@ sb.auth.onAuthStateChange((event, session) => {
   document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
   if (currentUser) {
     document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0] || "Vizinho");
-    if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-        document.getElementById('adminPanel').style.display = 'block';
-    }
+    if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) document.getElementById('adminPanel').style.display = 'block';
   }
   carregarAnuncios();
 });
@@ -229,11 +214,15 @@ sb.auth.onAuthStateChange((event, session) => {
 async function carregarAnuncios() {
   let query = sb.from('anuncios').select('*, usuarios(*)');
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  if (!isRodrigo) { query = query.eq('aprovado', true); }
+  if (!isRodrigo) query = query.eq('aprovado', true);
   const { data } = await query.order('criado_em', { ascending: false });
   currentData = data || [];
   filterData();
   if (currentUser) carregarPainelPerfil();
+
+  const params = new URLSearchParams(window.location.search);
+  const adId = params.get('ad');
+  if (adId) setTimeout(() => verDetalhes(adId), 600);
 }
 
 function filterByCat(el, catNome) {
@@ -254,48 +243,31 @@ function renderList(list) {
   container.innerHTML = list.map(item => {
     const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
     const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
-    const loc = item.usuarios?.tipo === 'morador' ? `Bloco ${item.usuarios.bloco} • Apto ${item.usuarios.apartamento}` : item.usuarios?.setor;
-    return `<div class="pcard" onclick="verDetalhes('${item.id}')">
-      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'"></div>
-      <div class="pcard-body"><div class="pcard-name">${item.titulo}</div><div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc || ''}</div>${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}</div>
-      ${thumb}</div>`
+    return `<div class="pcard" onclick="verDetalhes('${item.id}')"><div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'"></div><div class="pcard-body"><div class="pcard-name">${item.titulo}</div><div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.tipo === 'morador' ? 'B'+item.usuarios.bloco : item.usuarios?.setor || ''}</div>${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}</div>${thumb}</div>`
   }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">Nada encontrado.</p>';
 }
 
-// NOVA FUNÇÃO DE COMPARTILHAMENTO NATIVO
 async function shareAd(ad) {
-    const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco}` : ad.usuarios?.setor;
-    
-    // FORMATANDO O TEXTO BONITO
-    const shareText = `🏘️ *Refinatto Serviços* > > *${ad.titulo.toUpperCase()}* > Categoria: ${ad.categoria} > De: ${ad.usuarios.nome} (${loc}) > > Descrição: ${ad.descricao.substring(0, 100)}${ad.descricao.length > 100 ? '...' : ''} > > Veja as fotos reais e fale com o vizinho clicando no link abaixo:`;
-    const shareUrl = window.location.href; // Envia o link curto do app
-
-    if (navigator.share) {
-        // Se for no celular (nativo)
-        try {
-            await navigator.share({
-                title: `Refinatto: ${ad.titulo}`,
-                text: shareText,
-                url: shareUrl
-            });
-        } catch (error) { console.log('Erro ao compartilhar nativo:', error); }
-    } else {
-        // Fallback para Desktop (Copia o texto e url)
-        await navigator.clipboard.writeText(shareText + "\n" + shareUrl);
-        alert("Texto e link copiados! Cole no WhatsApp.");
-    }
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('ad', ad.id);
+    const finalUrl = url.toString();
+    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n📍 De: ${ad.usuarios.nome}\n\nConfira os detalhes aqui:`;
+    if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: finalUrl }); } catch (e) {} }
+    else { await navigator.clipboard.writeText(txt + "\n" + finalUrl); alert("Link copiado!"); }
 }
 
 function verDetalhes(id) {
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('ad', ad.id);
+  window.history.pushState({}, '', url);
+
   document.getElementById('detTitle').innerText = ad.titulo;
   const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
   document.getElementById('detDesc').innerText = ad.descricao || "";
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;">`).join('');
-  
-  // CONFIGURA BOTAO DE COMPARTILHAR
   document.getElementById('detShareBtn').onclick = () => shareAd(ad);
 
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -304,14 +276,19 @@ function verDetalhes(id) {
     document.getElementById('btnAprovarReal').style.display = ad.aprovado ? 'none' : 'block';
     document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
     document.getElementById('btnAdminDelete').onclick = () => deletarAnuncio(ad.id, true);
-  } else {
-    document.getElementById('adminControls').style.display = 'none';
-  }
+  } else { document.getElementById('adminControls').style.display = 'none'; }
   
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${cleanNum}?text=${encodeURIComponent('Olá, vi seu anúncio no Refinatto.')}`);
+  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${cleanNum}?text=${encodeURIComponent('Olá '+ad.usuarios.nome+', vi seu anúncio de "'+ad.titulo+'" no Refinatto.')}`);
   document.getElementById('detailOverlay').classList.add('open');
 }
+
+document.getElementById('btnCloseDetail').onclick = () => {
+    closeModal('detailOverlay');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('ad');
+    window.history.pushState({}, '', url);
+};
 
 async function aprovarAnuncio(id) {
     await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
@@ -320,35 +297,17 @@ async function aprovarAnuncio(id) {
 
 async function carregarPainelPerfil() {
   const isRodrigo = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  
-  // 1. Meus Anúncios
   const { data: meus } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  document.getElementById('myAdsList').innerHTML = (meus || []).map(ad => `
-    <div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
-      <div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div>
-      <button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button>
-    </div>`).join('') || '<p>Você não tem anúncios.</p>';
+  document.getElementById('myAdsList').innerHTML = (meus || []).map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div><button style="color:var(--red); border:none; background:none; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button></div>`).join('') || '<p>Sem anúncios.</p>';
 
-  // 2. Pendentes (Só para Admin)
   if (isRodrigo) {
     const { data: pendentes } = await sb.from('anuncios').select('*, usuarios(*)').eq('aprovado', false).order('criado_em', { ascending: false });
-    document.getElementById('pendingList').innerHTML = (pendentes || []).map(ad => `
-      <div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')">
-        <div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px; color:var(--muted)">De: ${ad.usuarios?.nome}</span></div>
-        <div style="display:flex; gap:10px;">
-          <button style="color:var(--forest); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); aprovarAnuncio('${ad.id}')">Aprovar</button>
-          <button style="color:var(--red); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}', true)">Excluir</button>
-        </div>
-      </div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Nenhum anúncio aguardando.</p>';
+    document.getElementById('pendingList').innerHTML = (pendentes || []).map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px; color:var(--muted)">De: ${ad.usuarios?.nome}</span></div><div style="display:flex; gap:10px;"><button style="color:var(--forest); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); aprovarAnuncio('${ad.id}')">Aprovar</button><button style="color:var(--red); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}', true)">Excluir</button></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Tudo ok!</p>';
   }
 }
 
 async function deletarAnuncio(id, fromAdmin = false) {
-  if(confirm(fromAdmin ? "ADMIN: Deseja remover este anúncio permanentemente?" : "Deseja excluir seu anúncio?")) { 
-    await sb.from('anuncios').delete().eq('id', id); 
-    closeModal('detailOverlay');
-    carregarAnuncios(); 
-  }
+  if(confirm("Deseja excluir?")) { await sb.from('anuncios').delete().eq('id', id); closeModal('detailOverlay'); carregarAnuncios(); }
 }
 
 function handlePhotos(input) {
@@ -361,23 +320,16 @@ function handlePhotos(input) {
 }
 
 function renderPhotoGrid() {
-  document.getElementById('photoGrid').innerHTML = itemPhotos.map((src, i) => `
-    <div class="photo-item-cad"><img src="${src}"><button class="btn-del-photo" onclick="itemPhotos.splice(${i}, 1); renderPhotoGrid();">✕</button></div>`).join('');
+  document.getElementById('photoGrid').innerHTML = itemPhotos.map((src, i) => `<div class="photo-item-cad"><img src="${src}"><button class="btn-del-photo" onclick="itemPhotos.splice(${i}, 1); renderPhotoGrid();">✕</button></div>`).join('');
 }
 
 async function salvarTudo() {
   const btn = document.getElementById('btnFinalizar');
-  const nome = document.getElementById('cadNome').value;
-  const sobrenome = document.getElementById('cadSobrenome').value;
-  if (!nome || !sobrenome) return alert("Preencha Nome e Sobrenome.");
-  btn.innerText = "Enviando..."; btn.disabled = true;
-
-  const u = { id: currentUser.id, email: currentUser.email, nome: `${nome} ${sobrenome}`, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
+  btn.innerText = "Publicando..."; btn.disabled = true;
+  const u = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
-  const { error } = await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
-  
-  if(!error) { alert("Anúncio enviado!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads'); }
-  else { alert("Erro ao salvar."); btn.innerText = "Enviar para Aprovação"; btn.disabled = false; }
+  await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
+  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads');
 }
 
 function showTab(tab) {
