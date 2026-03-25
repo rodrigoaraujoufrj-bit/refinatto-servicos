@@ -44,55 +44,53 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
 
-/* TOPBAR */
 .topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
 .brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
 .btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
 .user-info { color:var(--gold); font-size:11px; font-weight:600; }
 
-/* HERO E BUSCA */
 .hero { background:var(--forest); padding:32px 20px 20px; color:white; }
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
+
 .search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.search-box input { flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px; }
+.search-box input { flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px; color: var(--ink); }
 
-/* CARDS */
 .plist { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
 .pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
 .pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; }
+.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
 .pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* MODAIS */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; display:none; padding:15px; overflow-y:auto; }
 .overlay.open { display:flex; align-items: flex-start; justify-content: center; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; width: 100%; max-width: 410px; position: relative; margin: 20px 0; }
 
-/* BOTÕES */
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; }
-.btn-share { width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; gap:8px;}
-
-/* FORMULÁRIO */
-.cad-step { display: none; }
-.cad-step.active { display: block; }
 .grid-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .field { margin-bottom: 12px; width: 100%; }
 .field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; }
 
-/* STATUS */
-.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
-.status-pending { background: #FFF3CD; color: #856404; }
-.status-approved { background: #D4EDDA; color: #155724; }
+.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:700; cursor:pointer; font-size: 14px; margin-bottom: 8px; }
+.btn-share { width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; gap:8px;}
 
-/* NAV */
+.cad-step { display: none; }
+.cad-step.active { display: block; }
+
+.photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
+.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
+
+.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+.status-pending { background: #FFF3CD; color: #856404; }
+.status-approved { background: #D4EDDA; color: #155724; }
 </style>
 </head>
 <body>
@@ -115,10 +113,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageMyAds" style="display:none; padding:20px;">
     <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Painel de Controle</h2>
     <div id="adminPanel" style="display:none; margin-bottom: 30px;">
-        <h3 style="font-size: 10px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px;">Pendentes de Aprovação</h3>
+        <h3 style="font-size: 10px; text-transform: uppercase; color: var(--gold); letter-spacing:1px; margin-bottom: 10px;">Pendentes de Aprovação (Geral)</h3>
         <div id="pendingList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
     </div>
-    <h3 style="font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Meus Anúncios</h3>
+    <h3 style="font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing:1px; margin-bottom: 10px;">Meus Anúncios</h3>
     <div id="myAdsList" style="display:flex; flex-direction:column; gap:10px;"></div>
     <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="logout()">Sair da Conta</button>
 </div>
@@ -130,13 +129,13 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
     <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px;"></div>
     <div class="detail-photos" id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
     <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444;"></p>
+    
     <button class="btn-share" id="detShareBtn">🔗 Compartilhar anúncio</button>
-    
+
     <div id="adminControls" style="display:none; padding:15px; background:var(--gold-pale); border-radius:16px; margin-bottom:15px; border:1px solid var(--gold-light);">
-       <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white; margin-bottom: 8px;">✔️ Aprovar Agora</button>
-       <button class="btn-primary" id="btnAdminDelete" style="background:var(--red); color:white; font-size: 11px; padding:10px;">🗑️ Excluir permanentemente</button>
+       <button class="btn-primary" id="btnAprovarReal" style="background:var(--forest); color:white;">✔️ Aprovar Anúncio</button>
+       <button class="btn-primary" id="btnAdminDelete" style="background:var(--red); color:white; font-size: 11px;">🗑️ Excluir permanentemente</button>
     </div>
-    
     <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white;">💬 Chamar no WhatsApp</button>
   </div>
 </div>
@@ -150,7 +149,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div class="overlay" id="cadOverlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>Novo Anúncio</h2><button onclick="closeModal('cadOverlay')">✕</button></div>
-    
     <div class="cad-step active" id="step0">
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
@@ -166,14 +164,13 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
         </div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
-
     <div class="cad-step" id="step1">
         <div class="field"><label>Título</label><input type="text" id="cadTitulo"></div>
         <div class="field"><label>Categoria</label><select id="cadCat"></select></div>
         <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="4"></textarea></div>
         <div class="field">
           <label>Fotos (Máx 10)</label>
-          <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
+          <button id="btnPhotos" class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('photoInput').click()">📸 Adicionar Fotos</button>
           <input type="file" id="photoInput" multiple accept="image/*" onchange="handlePhotos(this)" style="display:none;">
           <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top:10px;"></div>
         </div>
@@ -199,6 +196,32 @@ async function setupCategorias() {
     });
 }
 
+// COMPRESSOR DE FOTO
+function compressImage(file, maxWidth = 1024) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7)); // Salva em JPEG com 70% de qualidade
+      };
+    };
+  });
+}
+
 async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); }
 async function logout() { await sb.auth.signOut(); window.location.reload(); }
 
@@ -214,13 +237,13 @@ sb.auth.onAuthStateChange((event, session) => {
 });
 
 async function carregarAnuncios() {
-  let query = sb.from('anuncios').select('*, usuarios(*)');
-  const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  if (!isRodrigo) query = query.eq('aprovado', true);
-  const { data } = await query.order('criado_em', { ascending: false });
+  const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
   currentData = data || [];
   filterData();
   if (currentUser) carregarPainelPerfil();
+  const params = new URLSearchParams(window.location.search);
+  const adId = params.get('ad');
+  if (adId) setTimeout(() => verDetalhes(adId), 600);
 }
 
 function filterByCat(el, catNome) {
@@ -231,7 +254,9 @@ function filterByCat(el, catNome) {
 
 function filterData() {
     const term = document.getElementById('searchInput').value.toLowerCase();
+    const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     let filtered = currentData;
+    if (!isRodrigo) filtered = filtered.filter(a => a.aprovado);
     if (activeCat) filtered = filtered.filter(i => i.categoria === activeCat);
     if (term) filtered = filtered.filter(i => i.titulo.toLowerCase().includes(term) || (i.usuarios?.nome && i.usuarios.nome.toLowerCase().includes(term)));
     renderList(filtered);
@@ -240,10 +265,10 @@ function filterData() {
 function renderList(list) {
   const container = document.getElementById('plist');
   container.innerHTML = list.map(item => {
-    const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}">` : '';
+    const thumb = (item.fotos && item.fotos.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}" loading="lazy">` : '';
     const userPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
     return `<div class="pcard" onclick="verDetalhes('${item.id}')">
-      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" onerror="this.src='https://ui-avatars.com/api/?name=V&background=F0E0B8&color=B8862A'"></div>
+      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${userPhoto}" loading="lazy"></div>
       <div class="pcard-body"><div class="pcard-name">${item.titulo}</div><div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${item.usuarios?.tipo === 'morador' ? 'B'+item.usuarios.bloco : item.usuarios?.setor || ''}</div>${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}</div>
       ${thumb}</div>`
   }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">Nada encontrado.</p>';
@@ -252,19 +277,28 @@ function renderList(list) {
 function verDetalhes(id) {
   const ad = currentData.find(a => a.id === id);
   if (!ad) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('ad', ad.id);
+  window.history.pushState({}, '', url);
+
   document.getElementById('detTitle').innerText = ad.titulo;
   const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
   document.getElementById('detDesc').innerText = ad.descricao || "";
-  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;">`).join('');
+  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;" loading="lazy">`).join('');
   document.getElementById('detShareBtn').onclick = () => shareAd(ad);
 
   const isRodrigo = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   if (isRodrigo) {
     document.getElementById('adminControls').style.display = 'block';
     document.getElementById('btnAprovarReal').style.display = ad.aprovado ? 'none' : 'block';
-    document.getElementById('btnAprovarReal').onclick = () => aprovarAnuncio(ad.id);
-    document.getElementById('btnAdminDelete').onclick = () => deletarAnuncio(ad.id);
+    document.getElementById('btnAprovarReal').onclick = async () => {
+        await sb.from('anuncios').update({ aprovado: true }).eq('id', ad.id);
+        alert("Aprovado!"); closeModal('detailOverlay'); carregarAnuncios();
+    };
+    document.getElementById('btnAdminDelete').onclick = async () => {
+        if(confirm("Excluir?")) { await sb.from('anuncios').delete().eq('id', ad.id); closeModal('detailOverlay'); carregarAnuncios(); }
+    };
   } else { document.getElementById('adminControls').style.display = 'none'; }
   
   const cleanNum = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
@@ -275,34 +309,18 @@ function verDetalhes(id) {
   document.getElementById('detailOverlay').classList.add('open');
 }
 
-async function aprovarAnuncio(id) {
-    const { error } = await sb.from('anuncios').update({ aprovado: true }).eq('id', id);
-    if (!error) {
-        alert("Anúncio aprovado com sucesso!");
-        closeModal('detailOverlay');
-        carregarAnuncios(); // Isso atualiza a Home e o Painel
-    } else {
-        alert("Erro ao aprovar.");
-    }
-}
-
 async function carregarPainelPerfil() {
   const isRodrigo = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  const { data: meus } = await sb.from('anuncios').select('*, usuarios(*)').eq('usuario_id', currentUser.id).order('criado_em', { ascending: false });
-  document.getElementById('myAdsList').innerHTML = (meus || []).map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div><button style="color:var(--red); border:none; background:none; font-weight:700;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button></div>`).join('') || '<p>Nenhum anúncio.</p>';
-
+  const meus = currentData.filter(ad => ad.usuario_id === currentUser.id);
+  document.getElementById('myAdsList').innerHTML = meus.map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div><button style="color:var(--red); border:none; background:none; font-weight:700;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button></div>`).join('') || '<p>Sem anúncios.</p>';
   if (isRodrigo) {
-    const { data: pendentes } = await sb.from('anuncios').select('*, usuarios(*)').eq('aprovado', false).order('criado_em', { ascending: false });
-    document.getElementById('pendingList').innerHTML = (pendentes || []).map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px; color:var(--muted)">De: ${ad.usuarios?.nome}</span></div><div style="display:flex; gap:10px;"><button style="color:var(--forest); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); aprovarAnuncio('${ad.id}')">Aprovar</button><button style="color:var(--red); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); deletarAnuncio('${ad.id}')">Excluir</button></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Tudo ok!</p>';
+    const pendentes = currentData.filter(ad => !ad.aprovado);
+    document.getElementById('pendingList').innerHTML = pendentes.map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px; color:var(--muted)">De: ${ad.usuarios?.nome}</span></div><div style="display:flex; gap:10px;"><button style="color:var(--forest); font-weight:700; background:none; border:none;" onclick="event.stopPropagation(); aprovarPeloPainel('${ad.id}')">Aprovar</button></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Tudo ok!</p>';
   }
 }
 
-async function deletarAnuncio(id) {
-  if(confirm("Deseja excluir este anúncio?")) { 
-    await sb.from('anuncios').delete().eq('id', id); 
-    closeModal('detailOverlay'); carregarAnuncios(); 
-  }
-}
+async function aprovarPeloPainel(id) { await sb.from('anuncios').update({ aprovado: true }).eq('id', id); carregarAnuncios(); }
+async function deletarAnuncio(id) { if(confirm("Deseja excluir?")) { await sb.from('anuncios').delete().eq('id', id); carregarAnuncios(); } }
 
 async function shareAd(ad) {
     const url = new URL(window.location.origin + window.location.pathname);
@@ -312,13 +330,19 @@ async function shareAd(ad) {
     else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado!"); }
 }
 
-function handlePhotos(input) {
+async function handlePhotos(input) {
   const files = Array.from(input.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => { itemPhotos.push(e.target.result); renderPhotoGrid(); };
-    reader.readAsDataURL(file);
-  });
+  const btn = document.getElementById('btnPhotos');
+  btn.innerText = "⏳ Reduzindo fotos...";
+  btn.disabled = true;
+
+  for (const file of files) {
+    const compressed = await compressImage(file);
+    itemPhotos.push(compressed);
+    renderPhotoGrid();
+  }
+  btn.innerText = "📸 Adicionar Fotos";
+  btn.disabled = false;
 }
 
 function renderPhotoGrid() {
@@ -331,7 +355,7 @@ async function salvarTudo() {
   const u = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
   await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
-  alert("Anúncio enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); showTab('myads');
+  alert("Pronto! Aguarde aprovação."); itemPhotos = []; closeModal('cadOverlay'); carregarAnuncios();
 }
 
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
@@ -349,12 +373,11 @@ function setTipo(t) {
   tipoUsuario = t; 
   document.getElementById('optM').style.background = t === 'morador' ? 'var(--forest-light)' : 'white'; 
   document.getElementById('optF').style.background = t === 'funcionario' ? 'var(--forest-light)' : 'white'; 
-  document.getElementById('wrapBloco').style.display = t === 'morador' ? 'block' : 'none'; 
-  document.getElementById('wrapApto').style.display = t === 'morador' ? 'block' : 'none'; 
-  document.getElementById('wrapSetor').style.display = t === 'funcionario' ? 'block' : 'none'; 
+  document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
+  document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
 }
 
-document.getElementById('btnCloseDetail').onclick = () => closeModal('detailOverlay');
+document.getElementById('btnCloseDetail').onclick = () => { closeModal('detailOverlay'); const url = new URL(window.location.href); url.searchParams.delete('ad'); window.history.pushState({}, '', url); };
 window.onload = () => { setupCategorias(); carregarAnuncios(); };
 </script>
 </body>
