@@ -75,17 +75,13 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .cad-step { display: none; }
 .cad-step.active { display: block; }
 
-.photo-item-cad { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-.photo-item-cad img { width: 100%; height: 100%; object-fit: cover; }
-.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+.status-pending { background: #FFF3CD; color: #856404; }
+.status-approved { background: #D4EDDA; color: #155724; }
 
 .nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
 .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; }
 .nav-item.active { color: var(--gold); }
-
-.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
-.status-pending { background: #FFF3CD; color: #856404; }
-.status-approved { background: #D4EDDA; color: #155724; }
 </style>
 </head>
 <body>
@@ -150,14 +146,15 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
             <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; padding:12px;" onclick="setTipo('morador')">Morador</div>
             <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; padding:12px;" onclick="setTipo('funcionario')">Funcionário</div>
         </div>
-        <div class="grid-fields">
-          <div class="field"><label>Nome</label><input type="text" id="cadNome"></div>
-          <div class="field"><label>Sobrenome</label><input type="text" id="cadSobrenome"></div>
-          <div class="field" id="wrapBloco"><label>Bloco</label><select id="cadBloco"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
-          <div class="field" id="wrapApto"><label>Apto</label><input type="text" id="cadApto"></div>
-          <div class="field" id="wrapSetor" style="display:none; grid-column: span 2;"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div>
-          <div class="field" style="grid-column: span 2;"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+        <div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Nome</label><input type="text" id="cadNome"></div><div class="field" style="flex:1;"><label>Sobrenome</label><input type="text" id="cadSobrenome"></div></div>
+        <div id="fieldsMorador">
+          <div style="display:flex; gap:10px;">
+            <div class="field" style="flex:1;"><label>Bloco</label><select id="cadBloco"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+            <div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto"></div>
+          </div>
         </div>
+        <div id="fieldsFunc" style="display:none;"><div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor"></div></div>
+        <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
         <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
     </div>
     <div class="cad-step" id="step1">
@@ -179,20 +176,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <script>
-async function setupCategorias() {
-    const bar = document.getElementById('catBar');
-    const select = document.getElementById('cadCat');
-    CATEGORIAS_LISTA.forEach(cat => {
-        const pill = document.createElement('div'); 
-        pill.className = 'cat-pill'; pill.innerText = `${cat.emoji} ${cat.nome}`;
-        pill.style = "flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer;";
-        pill.onclick = () => filterByCat(pill, cat.nome); bar.appendChild(pill);
-        const opt = document.createElement('option'); opt.value = cat.nome; opt.innerText = `${cat.emoji} ${cat.nome}`;
-        select.appendChild(opt);
-    });
-}
-
-// COMPRESSOR REUTILIZÁVEL (Usado no upload e no otimizador legado)
+// COMPRESSOR DE IMAGENS
 async function compressBase64(base64Str, maxWidth = 1024) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -214,6 +198,19 @@ async function compressBase64(base64Str, maxWidth = 1024) {
   });
 }
 
+async function setupCategorias() {
+    const bar = document.getElementById('catBar');
+    const select = document.getElementById('cadCat');
+    CATEGORIAS_LISTA.forEach(cat => {
+        const pill = document.createElement('div'); 
+        pill.className = 'cat-pill'; pill.innerText = `${cat.emoji} ${cat.nome}`;
+        pill.style = "flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer;";
+        pill.onclick = () => filterByCat(pill, cat.nome); bar.appendChild(pill);
+        const opt = document.createElement('option'); opt.value = cat.nome; opt.innerText = `${cat.emoji} ${cat.nome}`;
+        select.appendChild(opt);
+    });
+}
+
 async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); }
 async function logout() { await sb.auth.signOut(); window.location.reload(); }
 
@@ -229,7 +226,8 @@ sb.auth.onAuthStateChange((event, session) => {
 });
 
 async function carregarAnuncios() {
-  const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
+  const { data, error } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
+  if (error) { console.error(error); return; }
   currentData = data || [];
   filterData();
   if (currentUser) carregarPainelPerfil();
@@ -286,24 +284,17 @@ function verDetalhes(id) {
         alert("Aprovado!"); closeModal('detailOverlay'); carregarAnuncios();
     };
     
-    // FUNÇÃO DE OTIMIZAÇÃO MANUAL
+    // OTIMIZADOR DE LEGADO
     document.getElementById('btnOptimizeLegacy').onclick = async () => {
         const btn = document.getElementById('btnOptimizeLegacy');
-        btn.innerText = "⏳ Otimizando... Aguarde";
-        btn.disabled = true;
-        
+        btn.innerText = "⏳ Otimizando..."; btn.disabled = true;
         try {
             const novasFotos = [];
-            for(let f of ad.fotos) {
-                const comp = await compressBase64(f);
-                novasFotos.push(comp);
-            }
+            for(let f of ad.fotos) { const comp = await compressBase64(f); novasFotos.push(comp); }
             await sb.from('anuncios').update({ fotos: novasFotos }).eq('id', ad.id);
-            alert("Sucesso! Fotos reduzidas e banco atualizado.");
-            closeModal('detailOverlay'); carregarAnuncios();
+            alert("Sucesso! Fotos otimizadas."); closeModal('detailOverlay'); carregarAnuncios();
         } catch(e) { alert("Erro ao otimizar."); }
-        btn.innerText = "⚡ Otimizar Fotos Antigas (Reduzir peso)";
-        btn.disabled = false;
+        btn.innerText = "⚡ Otimizar Fotos Antigas"; btn.disabled = false;
     };
 
     document.getElementById('btnAdminDelete').onclick = async () => {
@@ -332,20 +323,10 @@ async function carregarPainelPerfil() {
 async function aprovarPeloPainel(id) { await sb.from('anuncios').update({ aprovado: true }).eq('id', id); carregarAnuncios(); }
 async function deletarAnuncio(id) { if(confirm("Deseja excluir?")) { await sb.from('anuncios').delete().eq('id', id); carregarAnuncios(); } }
 
-async function shareAd(ad) {
-    const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('ad', ad.id);
-    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira os detalhes aqui:`;
-    if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: url.toString() }); } catch (e) {} }
-    else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado!"); }
-}
-
 async function handlePhotos(input) {
   const files = Array.from(input.files);
   const btn = document.getElementById('btnPhotos');
-  btn.innerText = "⏳ Reduzindo fotos...";
-  btn.disabled = true;
-
+  btn.innerText = "⏳ Reduzindo..."; btn.disabled = true;
   for (const file of files) {
     const reader = new FileReader();
     const base64 = await new Promise(r => { reader.readAsDataURL(file); reader.onload = () => r(reader.result); });
@@ -353,8 +334,7 @@ async function handlePhotos(input) {
     itemPhotos.push(compressed);
     renderPhotoGrid();
   }
-  btn.innerText = "📸 Adicionar Fotos";
-  btn.disabled = false;
+  btn.innerText = "📸 Adicionar Fotos"; btn.disabled = false;
 }
 
 function renderPhotoGrid() {
@@ -367,7 +347,7 @@ async function salvarTudo() {
   const u = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: document.getElementById('cadBloco').value, apartamento: document.getElementById('cadApto').value, setor: document.getElementById('cadSetor').value, foto_url: currentUser.user_metadata.avatar_url };
   await sb.from('usuarios').upsert(u);
   await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCat').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
-  alert("Pronto! Aguarde aprovação."); itemPhotos = []; closeModal('cadOverlay'); carregarAnuncios();
+  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); carregarAnuncios();
 }
 
 function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.classList.toggle('active', i === n)); }
