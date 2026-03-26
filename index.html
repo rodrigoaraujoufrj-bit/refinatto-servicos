@@ -1,561 +1,210 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Refinatto — Serviços & Anúncios</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Refinatto Serviços</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23141210%22/><text y=%22.9em%22 x=%2250%%22 font-family=%22serif%22 font-weight=%22bold%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22%23B8862A%22>R</text></svg>">
-<meta name="theme-color" content="#141210">
+    <style>
+        :root {
+            --forest: #1E3A2F;
+            --gold: #C5A059;
+            --paper: #FDFBF7;
+            --text: #2D3436;
+            --border: #E8E2D6;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--paper); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: var(--text);
+            line-height: 1.5;
+        }
 
-<script>
-  // ✅ CONFIGURAÇÃO SUPABASE
-  const SUPABASE_URL = 'https://lrksdcydpsvdqzmxildj.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' // Sua chave pública
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  
-  // ✅ CONFIGURAÇÃO ADMIN
-  const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com'; // Seu e-mail de admin
-  const WHATSAPP_ADMIN = '5521982734393'; // Seu WhatsApp (com DDD) para publicidade
-  
-  // ✅ ESTADO GLOBAL
-  let currentUser = null, currentData = [], itemPhotos = [], editingAdId = null, activeCat = '', tipoUsuario = 'morador';
+        /* 🌤️ WIDGET DE CLIMA */
+        .weather-widget {
+            background: var(--forest);
+            color: white;
+            margin: 20px 20px 10px;
+            padding: 20px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 20px rgba(30, 58, 47, 0.15);
+        }
+        .weather-info { display: flex; flex-direction: column; gap: 4px; }
+        .weather-date { font-size: 11px; font-weight: 600; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .weather-temp { font-size: 36px; font-weight: 800; font-family: 'Playfair Display', serif; line-height: 1; margin: 4px 0; }
+        .weather-status { font-size: 13px; font-weight: 500; }
+        .weather-icon { font-size: 48px; }
 
-  // ✅ LISTA DE CATEGORIAS (Atualizada)
-  const CATEGORIAS_LISTA = [
-    { nome: "Saúde", emoji: "🩺" }, { nome: "Beleza", emoji: "✂️" }, { nome: "Gastronomia", emoji: "🍽️" },
-    { nome: "Infantil & Bebês", emoji: "🧸" }, { nome: "Turismo & Lazer", emoji: "✈️" },
-    { nome: "Reformas", emoji: "🏗️" }, { nome: "Automotivo", emoji: "🔧" }, { nome: "Pets", emoji: "🐾" },
-    { nome: "Aulas", emoji: "📚" }, { nome: "Festas", emoji: "🎈" }, { nome: "Imóveis", emoji: "🔑" },
-    { nome: "Transporte", emoji: "🚕" }, { nome: "Desapega", emoji: "🏷️" }, { nome: "Vagas", emoji: "🅿️" },
-    { nome: "Doações", emoji: "🤝" }, { nome: "Atividades", emoji: "🏃" }, { nome: "Estética Auto", emoji: "🚿" },
-    { nome: "Venda Auto", emoji: "🚘" }, { nome: "Corretores", emoji: "🏢" }, { nome: "Outros", emoji: "⭐" }
-  ];
-</script>
+        /* 📣 ESPAÇO PREMIUM (CURADORIA) */
+        .pub-container { padding: 0 20px 20px; }
+        .pub-banner-recruitment {
+            background: #F4F1EA;
+            border: 1.5px dashed var(--gold);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: default; /* Remove o cursor de clique */
+        }
+        .pub-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 18px; 
+            color: var(--gold); 
+            margin-bottom: 5px; 
+        }
+        .pub-sub { font-size: 13px; color: #888; font-weight: 500; }
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        /* 📱 ESTILO DOS ANÚNCIOS (LISTA GERAL) */
+        .feed-container { padding: 0 20px 100px; }
+        .section-header { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 22px; 
+            margin-bottom: 20px;
+            color: var(--forest);
+        }
+        
+        .ad-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .ad-image {
+            width: 80px; height: 80px;
+            border-radius: 15px;
+            object-fit: cover;
+            background: #eee;
+        }
+        .ad-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .ad-info p { font-size: 13px; color: #666; }
 
-<style>
-:root {
-  --ink: #141210; --paper: #F7F3ED; --card: #FDFAF6;
-  --gold: #B8862A; --gold-light: #F0E0B8; --gold-pale: #FAF3E2;
-  --forest: #1E3A2F; --forest-mid: #2E5943; --forest-light: #D4E8DC;
-  --border: #E5DDD0; --muted: #8A7E72; --wpp: #25D366; --red: #C0392B;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; color:var(--ink); max-width:430px; margin:0 auto; min-height:100vh; padding-bottom: 100px; border-left:1px solid var(--border); border-right:1px solid var(--border); position: relative; }
+        /* 🔍 BARRA DE BUSCA */
+        .search-area { padding: 0 20px 20px; }
+        .search-bar {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: white;
+            font-family: inherit;
+            font-size: 15px;
+        }
 
-/* UI Elements */
-.topbar { position:sticky; top:0; z-index:50; background:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:60px; }
-.brand { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
-.btn-login-top { background:var(--gold); color:var(--ink); border:none; border-radius:100px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer; }
-.user-info { color:var(--gold); font-size:11px; font-weight:600; }
-
-.hero { background:var(--forest); padding:32px 20px 20px; color:white; }
-.hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 15px; }
-
-.search-container { padding: 0 20px; margin-top: -20px; margin-bottom: 10px; }
-.search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.search-box input { flex: 1; border: none; outline: none; font-family: inherit; font-size: 14px; color: var(--ink); }
-
-/* 📣 NOVO: ESPAÇO PUBLICIDADE (CSS) */
-.pub-container {
-  padding: 10px 20px 0; /* Padding lateral alinhado com o app */
-}
-.pub-banner-recruitment {
-  width: 100%; height: 100px; /* Altura do banner provisório */
-  background: var(--gold-pale);
-  border: 2px dashed var(--gold);
-  border-radius: 20px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; cursor: pointer; padding: 15px;
-  transition: 0.2s;
-}
-.pub-banner-recruitment:hover { background: var(--gold-light); border-style: solid; }
-.pub-title { font-size: 14px; font-weight: 800; color: var(--forest); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.pub-sub { font-size: 12px; color: var(--ink); opacity: 0.8; line-height: 1.3; }
-
-/* Cards & List */
-.cats { display:flex; gap:8px; overflow-x:auto; padding:20px; scrollbar-width:none; }
-.cats::-webkit-scrollbar { display: none; }
-.cat-pill { flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer; transition: 0.2s; }
-.cat-pill.active { background:var(--forest); color:white; border-color: var(--forest); }
-
-.plist { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
-.pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; transition: 0.2s; }
-.pcard-profile-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
-.pcard-profile-img { width: 100%; height: 100%; object-fit: cover; }
-.pcard-body { flex:1; min-width:0; }
-.pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
-.pcard-sub { font-size: 11px; color: var(--muted); }
-.pcard-thumb { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
-
-/* Modals & Overlays */
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; display:none; padding:15px; overflow-y:auto; }
-.overlay.open { display:flex; align-items: flex-start; justify-content: center; }
-.modal-card { background:var(--paper); border-radius:28px; padding:24px; width: 100%; max-width: 410px; position: relative; margin: 20px 0; }
-.close-modal { position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color: var(--muted); }
-
-/* Buttons */
-.btn-primary { width:100%; background:var(--gold); color:var(--ink); border:none; border-radius:14px; padding:16px; font-weight:800; cursor:pointer; font-size: 14px; margin-bottom: 8px; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;}
-.btn-primary:active { transform: scale(0.98); }
-.btn-share { width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; gap:8px; font-size: 12px;}
-
-/* Forms */
-.field { margin-bottom: 12px; }
-.field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-.field input, .field select, .field textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; background: white; color: var(--ink); }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
-
-/* Photo Grid */
-.photo-grid-common { display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top:10px; }
-.photo-item { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #eee; }
-.photo-item img { width: 100%; height: 100%; object-fit: cover; }
-.btn-del-photo { position: absolute; top: 4px; right: 4px; background: var(--red); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
-
-/* Nav Bottom */
-.nav-bottom { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; box-shadow: 0 -4px 12px rgba(0,0,0,0.03); }
-.nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; font-weight: 600; flex: 1; gap: 4px; }
-.nav-item span:first-child { font-size: 18px; }
-.nav-item.active { color: var(--gold); }
-
-/* Status */
-.status-pill { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: inline-block; }
-.status-pending { background: #FFF3CD; color: #856404; }
-.status-approved { background: #D4EDDA; color: #155724; }
-</style>
+    </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand">Refinatto<sup>serviços</sup></div>
-  <div id="authArea">
-    <button id="btnLogin" class="btn-login-top" onclick="loginGoogle()">ENTRAR</button>
-    <div id="userHeader" class="user-info" style="display:none;"></div>
-  </div>
-</div>
-
-<div id="pageHome">
-  <div class="hero"><h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1></div>
-  
-  <div class="search-container">
-    <div class="search-box">🔍 <input type="text" id="searchInput" placeholder="O que você procura?" oninput="filterData()"></div>
-  </div>
-
-  <div class="pub-container">
-    <div class="pub-banner-recruitment" id="btnRecruitmentPub">
-      <div class="pub-title">Anuncie Aqui! 🚀</div>
-      <div class="pub-sub">Destaque seu negócio para todo o condomínio.<br>Clique e saiba como.</div>
-    </div>
-  </div>
-
-  <div class="cats" id="catBar">
-    <div class="cat-pill active" id="pillTodos" onclick="filterByCat(this, '')">🏠 Todos</div>
-  </div>
-  
-  <div class="plist" id="plist"></div>
-</div>
-
-<div id="pageMyAds" style="display:none; padding:20px;">
-    <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Painel de Controle</h2>
-    
-    <div id="adminPanel" style="display:none; margin-bottom: 30px;">
-        <h3 style="font-size: 10px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">Pendentes de Aprovação</h3>
-        <div id="pendingList" style="display:flex; flex-direction:column; gap:10px;"></div>
-        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border);">
-    </div>
-    
-    <h3 style="font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">Meus Anúncios</h3>
-    <div id="myAdsList" style="display:flex; flex-direction:column; gap:10px;"></div>
-    
-    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="logout()">Sair da Conta</button>
-</div>
-
-<div class="overlay" id="detailOverlay">
-  <div class="modal-card">
-    <button class="close-modal" onclick="closeModal('detailOverlay')">✕</button>
-    
-    <div id="viewMode">
-      <h2 id="detTitle" style="font-family:'Playfair Display', serif; margin-bottom:10px; font-size: 22px;"></h2>
-      <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px; font-weight: 600;"></div>
-      
-      <div id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
-      
-      <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444; white-space: pre-wrap;"></p>
-      
-      <button class="btn-share" id="btnShareLink">🔗 Compartilhar anúncio</button>
-
-      <div id="adminTools" style="display:none; background:var(--gold-pale); padding:15px; border-radius:20px; border:1.5px solid var(--gold-light); margin-bottom:20px;">
-        <button class="btn-primary" id="btnOpenEdit" style="background:var(--forest); color:white;">✏️ Corrigir Anúncio (Admin)</button>
-        <button class="btn-primary" id="btnQuickApprove" style="background:var(--forest-mid); color:white; display:none;">✔️ Aprovar Agora</button>
-        <button class="btn-primary" id="btnDeleteAd" style="background:var(--red); color:white; font-size:11px; margin-bottom: 0;">🗑️ Excluir para sempre</button>
-      </div>
-      
-      <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white; margin-bottom: 0;">💬 Chamar no WhatsApp</button>
+    <div id="weatherArea" style="display:none;">
+        <div class="weather-widget">
+            <div class="weather-info">
+                <span class="weather-date" id="weatherDate">Hoje no Méier</span>
+                <span class="weather-temp" id="weatherTemp">--°C</span>
+                <span class="weather-status" id="weatherStatus">Carregando...</span>
+            </div>
+            <div class="weather-icon" id="weatherEmoji">☀️</div>
+        </div>
     </div>
 
-    <div id="editMode" style="display:none;">
-      <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Corrigir Anúncio</h2>
-      <div class="field"><label>Título</label><input type="text" id="editInpTitle"></div>
-      <div class="field"><label>Categoria</label><select id="editInpCat"></select></div>
-      <div class="field"><label>Descrição</label><textarea id="editInpDesc" rows="6"></textarea></div>
-      <div class="field">
-        <label>Fotos (Máx 6)</label>
-        <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('editFile').click()">📸 Trocar/Add Fotos</button>
-        <input type="file" id="editFile" multiple accept="image/*" onchange="processPhotos(this, 'edit')" style="display:none;">
-        <div id="editPhotoGrid" class="photo-grid-common"></div>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:20px;">
-        <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1; margin-bottom: 0;" onclick="toggleEditMode(false)">Cancelar</button>
-        <button id="btnSaveEdit" class="btn-primary" style="flex:2; margin-bottom: 0;" onclick="saveChanges()">Salvar Alterações</button>
-      </div>
+    <div class="pub-container" id="premiumSpace">
+        <div class="pub-banner-recruitment">
+            <div class="pub-title">Espaço Premium 🌟</div>
+            <div class="pub-sub">Em breve novidades para esse espaço...</div>
+        </div>
     </div>
-  </div>
-</div>
 
-<div class="overlay" id="cadOverlay">
-  <div class="modal-card">
-    <button class="close-modal" onclick="closeModal('cadOverlay')">✕</button>
-    <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px; font-size: 22px;">Novo Anúncio</h2>
-    
-    <div id="step0" class="cad-step">
-      <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; margin-bottom: 0;" onclick="setTipo('morador')">Morador</div>
-        <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; margin-bottom: 0;" onclick="setTipo('funcionario')">Funcionário</div>
-      </div>
-      
-      <div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Nome</label><input type="text" id="cadNome"></div><div class="field" style="flex:1;"><label>Sobrenome</label><input type="text" id="cadSobrenome"></div></div>
-      
-      <div id="fieldsMorador">
-        <div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><select id="cadBloco"><option>1</option><option>2</option><option>3</option><option>4</option></select></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto" placeholder="101"></div></div>
-      </div>
-      
-      <div id="fieldsFunc" style="display:none;">
-        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Portaria, Limpeza, Admin"></div>
-      </div>
-      
-      <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
-      
-      <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
+    <div class="search-area">
+        <input type="text" class="search-bar" placeholder="O que você precisa hoje?" id="searchInput" oninput="filterAds()">
     </div>
-    
-    <div id="step1" class="cad-step" style="display:none;">
-      <div class="field"><label>Título do Anúncio</label><input type="text" id="cadTitulo" placeholder="Ex: Manicure Domicílio, Vendo Berço"></div>
-      <div class="field"><label>Categoria</label><select id="cadCatSel"></select></div>
-      <div class="field"><label>Descrição (Opcional)</label><textarea id="cadDesc" rows="4" placeholder="Detalhes, preços, horários..."></textarea></div>
-      
-      <div class="field">
-        <label>Fotos (Máx 6)</label>
-        <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('cadFile').click()">📸 Adicionar Fotos</button>
-        <input type="file" id="cadFile" multiple accept="image/*" onchange="processPhotos(this, 'cad')" style="display:none;">
-        <div id="cadPhotoGrid" class="photo-grid-common"></div>
-      </div>
-      
-      <div style="display:flex; gap:10px;">
-        <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1; margin-bottom: 0;" onclick="goStep(0)">Voltar</button>
-        <button id="btnFinalizar" class="btn-primary" style="flex:2; margin-bottom: 0;" onclick="salvarTudo()">Publicar Anúncio</button>
-      </div>
+
+    <div class="feed-container">
+        <h2 class="section-header">Serviços do Condomínio</h2>
+        <div id="adFeed">
+            </div>
     </div>
-  </div>
-</div>
 
-<div class="nav-bottom">
-    <div class="nav-item active" id="navHomeBtn" onclick="showTab('home')"><span>🏠</span><span>Início</span></div>
-    <div class="nav-item" onclick="handleAnunciarClick()"><span>➕</span><span>Anunciar</span></div>
-    <div class="nav-item" id="navUserBtn" onclick="showTab('myads')"><span>👤</span><span>Perfil</span></div>
-</div>
+    <script>
+        // Configurações do Supabase
+        const SB_URL = "https://lrksdcydpsvdqzmxildj.supabase.co";
+        const SB_KEY = "sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-<script>
-// --- UTILITÁRIOS ---
+        let allAds = [];
 
-// Compressor de Imagens ( Client-side para não quebrar o banco )
-async function compress(b64) {
-  return new Promise(res => {
-    const img = new Image(); img.src = b64;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > 1024) { h = (1024 / w) * h; w = 1024; } // Limita largura a 1024px
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-      res(canvas.toDataURL('image/jpeg', 0.7)); // Salva em JPEG com 70% de qualidade
-    };
-  });
-}
+        // 🌡️ FUNÇÃO CLIMA (COORDENADAS NORTESHOPPING)
+        async function updateWeather() {
+            try {
+                const lat = -22.8861; 
+                const lon = -43.2835;
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=America/Sao_Paulo`);
+                const data = await response.json();
+                const w = data.current_weather;
 
-// Inicializa Categorias nos selects e na home
-function setupCats() {
-  const bar = document.getElementById('catBar');
-  const sEdit = document.getElementById('editInpCat'), sCad = document.getElementById('cadCatSel');
-  
-  CATEGORIAS_LISTA.forEach(c => {
-    // Pills da Home
-    const p = document.createElement('div'); p.className = 'cat-pill'; p.innerText = `${c.emoji} ${c.nome}`;
-    p.onclick = () => filterByCat(p, c.nome); bar.appendChild(p);
-    
-    // Selects de Cadastro/Edição
-    [sEdit, sCad].forEach(s => { const o = document.createElement('option'); o.value = c.nome; o.innerText = `${c.emoji} ${c.nome}`; s.appendChild(o); });
-  });
-}
+                const codes = {
+                    0: ["☀️", "Céu Limpo"], 1: ["🌤️", "Poucas Nuvens"], 2: ["⛅", "Nublado"], 3: ["☁️", "Encoberto"],
+                    45: ["🌫️", "Nevoeiro"], 51: ["🌦️", "Garoa"], 61: ["🌧️", "Chuva"], 80: ["🌧️", "Pancadas de Chuva"], 95: ["⛈️", "Tempestade"]
+                };
 
-// --- AUTENTICAÇÃO ---
-async function loginGoogle() { 
-  const btn = document.getElementById('btnLogin'); btn.innerText = "⏳..."; btn.disabled = true;
-  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
-}
-async function logout() { await sb.auth.signOut(); window.location.reload(); }
+                const info = codes[w.weathercode] || ["🌡️", "Instável"];
+                document.getElementById('weatherTemp').innerText = `${Math.round(w.temperature)}°C`;
+                document.getElementById('weatherStatus').innerText = info[1];
+                document.getElementById('weatherEmoji').innerText = info[0];
+                document.getElementById('weatherArea').style.display = 'block';
 
-sb.auth.onAuthStateChange((event, session) => {
-  currentUser = session?.user || null;
-  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
-  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
-  if (currentUser) {
-    document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0]);
-    // Mostra painel admin se for o seu e-mail
-    if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) document.getElementById('adminPanel').style.display = 'block';
-  }
-  loadAll();
-});
-
-// --- CARREGAMENTO & FILTROS ---
-async function loadAll() {
-  const { data, error } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
-  if(error) { console.error(error); return; }
-  currentData = data || []; 
-  filterData(); 
-  if (currentUser) renderProfile();
-  
-  // DEEP LINKING CHECK (Abre anúncio específico via URL)
-  const adId = new URLSearchParams(window.location.search).get('ad'); if (adId) setTimeout(() => verDetalhes(adId), 600);
-}
-
-function filterByCat(el, cat) {
-    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-    el.classList.add('active'); activeCat = cat; filterData();
-}
-
-function filterData() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    let list = currentData;
-    
-    // Se não for admin, só vê os aprovados
-    if (!isAdmin) list = list.filter(a => a.aprovado);
-    if (activeCat) list = list.filter(i => i.categoria === activeCat);
-    if (term) list = list.filter(i => i.titulo.toLowerCase().includes(term));
-    renderFeed(list);
-}
-
-// Renderiza a lista principal (Home)
-function renderFeed(list) {
-  const container = document.getElementById('plist');
-  container.innerHTML = list.map(item => {
-    const thumb = (item.fotos?.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}" loading="lazy">` : '';
-    const uPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
-    const loc = item.usuarios?.tipo === 'morador' ? `B${item.usuarios.bloco}` : item.usuarios?.setor || 'Vizinho';
-    
-    return `<div class="pcard" onclick="verDetalhes('${item.id}')">
-      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${uPhoto}" loading="lazy"></div>
-      <div class="pcard-body">
-        <div class="pcard-name">${item.titulo}</div>
-        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc}</div>
-        ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
-      </div>
-      ${thumb}
-    </div>`
-  }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted); font-size: 12px;">Nenhum anúncio encontrado nesta categoria.</p>';
-}
-
-// --- DETALHES & COMPARTILHAMENTO ---
-function verDetalhes(id) {
-  const ad = currentData.find(a => a.id === id); if (!ad) return;
-  
-  // Atualiza URL (Deep Linking)
-  const url = new URL(window.location.href); url.searchParams.set('ad', ad.id); window.history.pushState({}, '', url);
-  
-  editingAdId = id; toggleEditMode(false); // Garante que abre no modo visualização
-  
-  document.getElementById('detTitle').innerText = ad.titulo;
-  const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor || '';
-  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
-  document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição adicional.";
-  
-  // Fotos do Detalhe
-  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;" loading="lazy">`).join('');
-  
-  // Configura botões
-  document.getElementById('btnShareLink').onclick = () => shareAd(ad);
-  
-  // Controles Admin
-  const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  if (isAdmin) {
-    document.getElementById('adminTools').style.display = 'block';
-    document.getElementById('btnQuickApprove').style.display = ad.aprovado ? 'none' : 'block';
-    document.getElementById('btnQuickApprove').onclick = async () => { 
-        if(confirm("Aprovar este anúncio?")) {
-            await sb.from('anuncios').update({ aprovado: true }).eq('id', id); loadAll(); closeModal('detailOverlay'); 
+                const options = { weekday: 'long', day: 'numeric', month: 'short' };
+                const dt = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
+                document.getElementById('weatherDate').innerText = dt.charAt(0).toUpperCase() + dt.slice(1);
+            } catch (e) { console.error("Erro clima", e); }
         }
-    };
-    document.getElementById('btnOpenEdit').onclick = () => startEditing(ad);
-    document.getElementById('btnDeleteAd').onclick = async () => { if(confirm("Tem certeza que deseja EXCLUIR PERMANENTEMENTE este anúncio?")) { await sb.from('anuncios').delete().eq('id', id); loadAll(); closeModal('detailOverlay'); } };
-  } else { document.getElementById('adminTools').style.display = 'none'; }
-  
-  // Zap do Vizinho
-  const zap = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${zap}?text=${encodeURIComponent('Oi '+ad.usuarios?.nome+', vi seu anúncio no Refinatto: '+ad.titulo)}`);
-  
-  document.getElementById('detailOverlay').classList.add('open');
-}
 
-// Função de Compartilhar Nativa ( Deep Linking )
-async function shareAd(ad) {
-    const url = new URL(window.location.origin + window.location.pathname); url.searchParams.set('ad', ad.id);
-    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira os detalhes e entre em contato direto pelo link:`;
-    if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: url.toString() }); } catch (e) {} }
-    else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado para a área de transferência!"); }
-}
+        // 📋 CARREGAR ANÚNCIOS
+        async function loadAds() {
+            const { data, error } = await sb.from('anuncios').select('*').order('criado_em', { ascending: false });
+            if (data) {
+                allAds = data;
+                renderAds(allAds);
+            }
+        }
 
-// --- EDIÇÃO (SÓ ADMIN) ---
-function toggleEditMode(on) {
-  document.getElementById('viewMode').style.display = on ? 'none' : 'block';
-  document.getElementById('editMode').style.display = on ? 'block' : 'none';
-}
+        function renderAds(ads) {
+            const feed = document.getElementById('adFeed');
+            feed.innerHTML = ads.map(ad => `
+                <div class="ad-card" onclick="window.open('https://wa.me/${ad.whatsapp}', '_blank')">
+                    <img src="${ad.imagem_url || 'https://via.placeholder.com/80'}" class="ad-image">
+                    <div class="ad-info">
+                        <h3>${ad.titulo}</h3>
+                        <p>${ad.descricao.substring(0, 60)}...</p>
+                        <span style="font-size: 11px; color: var(--gold); font-weight: 700;">VER CONTATO</span>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-function startEditing(ad) {
-  document.getElementById('editInpTitle').value = ad.titulo;
-  document.getElementById('editInpCat').value = ad.categoria;
-  document.getElementById('editInpDesc').value = ad.descricao;
-  itemPhotos = [...(ad.fotos || [])]; renderPhotos('edit'); toggleEditMode(true);
-}
+        function filterAds() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allAds.filter(ad => 
+                ad.titulo.toLowerCase().includes(term) || 
+                ad.descricao.toLowerCase().includes(term)
+            );
+            renderAds(filtered);
+        }
 
-async function saveChanges() {
-  const btn = document.getElementById('btnSaveEdit'); btn.innerText = "⏳..."; btn.disabled = true;
-  const { error } = await sb.from('anuncios').update({ 
-      titulo: document.getElementById('editInpTitle').value, 
-      categoria: document.getElementById('editInpCat').value, 
-      descricao: document.getElementById('editInpDesc').value, 
-      fotos: itemPhotos, 
-      aprovado: true // Aprova automaticamente ao editar
-  }).eq('id', editingAdId);
-  
-  if(error) alert("Erro ao salvar: " + error.message);
-  else { alert("Anúncio atualizado com sucesso!"); loadAll(); closeModal('detailOverlay'); }
-  btn.innerText = "Salvar Alterações"; btn.disabled = false;
-}
-
-// --- CADASTRO (ANUNCIAR) ---
-async function processPhotos(input, mode) {
-  const files = Array.from(input.files);
-  // ✅ TRAVA DE SEGURANÇA: MÁXIMO 6 FOTOS (Para não quebrar o banco gratuito)
-  if ((itemPhotos.length + files.length) > 6) { alert("Limite de 6 fotos por anúncio para garantir o desempenho do app."); return; }
-  
-  const btn = input.previousElementSibling; const originalText = btn.innerText;
-  btn.innerText = "⏳ Comprimindo..."; btn.disabled = true;
-
-  for (const f of files) {
-    const b64 = await new Promise(r => { const reader = new FileReader(); reader.readAsDataURL(f); reader.onload = () => r(reader.result); });
-    const low = await compress(b64); itemPhotos.push(low); renderPhotos(mode);
-  }
-  btn.innerText = originalText; btn.disabled = false; input.value = ''; // Limpa input
-}
-
-function renderPhotos(mode) {
-  const grid = document.getElementById(mode === 'edit' ? 'editPhotoGrid' : 'cadPhotoGrid');
-  grid.innerHTML = itemPhotos.map((s, i) => `<div class="photo-item"><img src="${s}"><button class="btn-del-photo" onclick="itemPhotos.splice(${i},1); renderPhotos('${mode}');">✕</button></div>`).join('');
-}
-
-function setTipo(t) { 
-    tipoUsuario = t; 
-    document.getElementById('optM').style = t === 'morador' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
-    document.getElementById('optF').style = t === 'funcionario' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
-    document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
-    document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
-}
-
-async function salvarTudo() {
-  // Validação básica
-  if(!document.getElementById('cadTitulo').value || itemPhotos.length === 0) { alert("Título e pelo menos uma foto são obrigatórios."); return; }
-
-  const btn = document.getElementById('btnFinalizar'); btn.innerText = "⏳ Publicando..."; btn.disabled = true;
-  
-  // 1. Atualiza/Cria perfil do usuário
-  const u = { 
-      id: currentUser.id, 
-      email: currentUser.email, 
-      nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, 
-      whatsapp: document.getElementById('cadWpp').value, 
-      tipo: tipoUsuario, 
-      bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, 
-      apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, 
-      setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, 
-      foto_url: currentUser.user_metadata.avatar_url 
-  };
-  await sb.from('usuarios').upsert(u);
-  
-  // 2. Insere o anúncio (pendente de aprovação)
-  const { error } = await sb.from('anuncios').insert([{ 
-      usuario_id: currentUser.id, 
-      titulo: document.getElementById('cadTitulo').value, 
-      categoria: document.getElementById('cadCatSel').value, 
-      descricao: document.getElementById('cadDesc').value, 
-      fotos: itemPhotos, 
-      aprovado: false // Padrão é pendente
-  }]);
-  
-  if(error) alert("Erro ao publicar: " + error.message);
-  else { alert("Anúncio enviado com sucesso! Aguarde a aprovação do administrador."); itemPhotos = []; closeModal('cadOverlay'); loadAll(); }
-  btn.innerText = "Publicar Anúncio"; btn.disabled = false;
-}
-
-// --- PERFIL & PAINEL ---
-function renderProfile() {
-  // Lista Meus Anúncios
-  const meus = currentData.filter(ad => ad.usuario_id === currentUser.id);
-  document.getElementById('myAdsList').innerHTML = meus.map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Você ainda não tem anúncios.</p>';
-  
-  // Lista Pendentes (Só Admin)
-  if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    const pendentes = currentData.filter(ad => !ad.aprovado);
-    document.getElementById('pendingList').innerHTML = pendentes.map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px;">De: ${ad.usuarios?.nome}</span></div></div>`).join('') || '<p style="font-size:12px; color:var(--forest-mid); font-weight:600;">✅ Tudo revisado!</p>';
-  }
-}
-
-// --- NAVEGAÇÃO & UI ---
-function showTab(t) {
-  document.getElementById('pageHome').style.display = t === 'home' ? 'block' : 'none';
-  document.getElementById('pageMyAds').style.display = t === 'myads' ? 'block' : 'none';
-  document.getElementById('navHomeBtn').classList.toggle('active', t === 'home');
-  document.getElementById('navUserBtn').classList.toggle('active', t === 'myads');
-}
-
-function handleAnunciarClick() { 
-  if (!currentUser) { alert("Você precisa estar logado para anunciar."); loginGoogle(); } 
-  else { 
-    itemPhotos = []; renderPhotos('cad'); goStep(0); 
-    // Pré-preenche se já tiver dados (ajuste futuro)
-    document.getElementById('cadOverlay').classList.add('open'); 
-  } 
-}
-function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.style.display = i === n ? 'block' : 'none'); }
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('open'); editingAdId = null; 
-  // Limpa URL (Deep Linking)
-  const u = new URL(window.location.href); u.searchParams.delete('ad'); window.history.pushState({}, '', u); 
-}
-
-// ✅ INICIALIZAÇÃO
-window.onload = () => { 
-  setupCats(); 
-  loadAll(); 
-  
-  // 📣 NOVO: LÓGICA DO BANNER DE RECRUTAMENTO (JS)
-  document.getElementById('btnRecruitmentPub').onclick = () => {
-    const txt = `Oi Rodrigo, tenho interesse em anunciar no destaque do Refinatto Serviços. Pode me passar os detalhes?`;
-    window.open(`https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(txt)}`);
-  };
-};
-</script>
+        window.onload = () => {
+            updateWeather();
+            loadAds();
+        };
+    </script>
 </body>
 </html>
