@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Refinatto Serviços</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -20,92 +20,81 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            background-color: var(--paper); 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: var(--text);
-            line-height: 1.5;
-        }
+        body { background-color: var(--paper); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text); }
+
+        /* TÍTULO DO APP */
+        .header-app { padding: 30px 20px 10px; text-align: center; }
+        .header-app h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--forest); }
+        .header-app p { font-size: 10px; color: var(--gold); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
 
         /* 🌤️ WIDGET DE CLIMA */
         .weather-widget {
             background: var(--forest);
             color: white;
-            margin: 20px 20px 10px;
-            padding: 20px;
-            border-radius: 24px;
+            margin: 10px 20px;
+            padding: 18px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 8px 20px rgba(30, 58, 47, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .weather-info { display: flex; flex-direction: column; gap: 4px; }
-        .weather-date { font-size: 11px; font-weight: 600; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .weather-temp { font-size: 36px; font-weight: 800; font-family: 'Playfair Display', serif; line-height: 1; margin: 4px 0; }
-        .weather-status { font-size: 13px; font-weight: 500; }
-        .weather-icon { font-size: 48px; }
+        .weather-info { display: flex; flex-direction: column; }
+        .weather-date { font-size: 10px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
+        .weather-temp { font-size: 32px; font-weight: 800; font-family: 'Playfair Display', serif; margin: 2px 0; }
+        .weather-status { font-size: 12px; font-weight: 500; }
+        .weather-icon { font-size: 40px; }
 
-        /* 📣 ESPAÇO PREMIUM (CURADORIA) */
-        .pub-container { padding: 0 20px 20px; }
+        /* BANNER PREMIUM (MODO CURADORIA) */
+        .pub-container { padding: 10px 20px; }
         .pub-banner-recruitment {
             background: #F4F1EA;
             border: 1.5px dashed var(--gold);
             border-radius: 20px;
-            padding: 25px 20px;
+            padding: 20px;
             text-align: center;
-            cursor: default; /* Remove o cursor de clique */
         }
-        .pub-title { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 18px; 
-            color: var(--gold); 
-            margin-bottom: 5px; 
-        }
-        .pub-sub { font-size: 13px; color: #888; font-weight: 500; }
+        .pub-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 4px; }
+        .pub-sub { font-size: 12px; color: #888; font-weight: 500; }
 
-        /* 📱 ESTILO DOS ANÚNCIOS (LISTA GERAL) */
-        .feed-container { padding: 0 20px 100px; }
-        .section-header { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 22px; 
-            margin-bottom: 20px;
-            color: var(--forest);
+        /* CATEGORIAS */
+        .categories-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px;
+            scrollbar-width: none;
         }
-        
-        .ad-card {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            display: flex;
-            gap: 15px;
-            align-items: center;
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: white; border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 12px; white-space: nowrap;
+            font-size: 13px; font-weight: 600; color: var(--forest);
         }
-        .ad-image {
-            width: 80px; height: 80px;
-            border-radius: 15px;
-            object-fit: cover;
-            background: #eee;
-        }
-        .ad-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-        .ad-info p { font-size: 13px; color: #666; }
+        .cat-btn.active { background: var(--forest); color: white; border-color: var(--forest); }
 
-        /* 🔍 BARRA DE BUSCA */
-        .search-area { padding: 0 20px 20px; }
+        /* BUSCA */
+        .search-area { padding: 0 20px 15px; }
         .search-bar {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-            background: white;
-            font-family: inherit;
-            font-size: 15px;
+            width: 100%; padding: 15px; border-radius: 15px;
+            border: 1px solid var(--border); background: white; font-size: 15px;
         }
 
+        /* FEED DE ANÚNCIOS */
+        .feed-container { padding: 0 20px 100px; }
+        .ad-card {
+            background: white; border-radius: 20px; padding: 15px;
+            margin-bottom: 15px; border: 1px solid var(--border);
+            display: flex; gap: 15px; align-items: center;
+        }
+        .ad-image { width: 75px; height: 75px; border-radius: 12px; object-fit: cover; }
+        .ad-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .ad-info p { font-size: 12px; color: #666; line-height: 1.3; }
     </style>
 </head>
 <body>
+
+    <header class="header-app">
+        <h1>Refinatto Serviços</h1>
+        <p>Curadoria Exclusiva</p>
+    </header>
 
     <div id="weatherArea" style="display:none;">
         <div class="weather-widget">
@@ -118,93 +107,97 @@
         </div>
     </div>
 
-    <div class="pub-container" id="premiumSpace">
+    <div class="pub-container">
         <div class="pub-banner-recruitment">
             <div class="pub-title">Espaço Premium 🌟</div>
-            <div class="pub-sub">Em breve novidades para esse espaço...</div>
+            <div class="pub-sub">Em breve novidades para este espaço...</div>
         </div>
     </div>
 
     <div class="search-area">
-        <input type="text" class="search-bar" placeholder="O que você precisa hoje?" id="searchInput" oninput="filterAds()">
+        <input type="text" class="search-bar" placeholder="O que você precisa?" id="searchInput" oninput="filterData()">
     </div>
 
-    <div class="feed-container">
-        <h2 class="section-header">Serviços do Condomínio</h2>
-        <div id="adFeed">
-            </div>
+    <div class="categories-scroll">
+        <button class="cat-btn active" onclick="filterCategory('Tudo', this)">Tudo</button>
+        <button class="cat-btn" onclick="filterCategory('Gastronomia', this)">Gastronomia</button>
+        <button class="cat-btn" onclick="filterCategory('Reformas', this)">Reformas</button>
+        <button class="cat-btn" onclick="filterCategory('Beleza', this)">Beleza</button>
+        <button class="cat-btn" onclick="filterCategory('Saúde', this)">Saúde</button>
+        <button class="cat-btn" onclick="filterCategory('Outros', this)">Outros</button>
     </div>
+
+    <div class="feed-container" id="adFeed">
+        </div>
 
     <script>
-        // Configurações do Supabase
+        // --- 🔑 COLOQUE SUAS CHAVES AQUI ---
         const SB_URL = "https://lrksdcydpsvdqzmxildj.supabase.co";
         const SB_KEY = "sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL";
+        // -----------------------------------
+
         const sb = supabase.createClient(SB_URL, SB_KEY);
-
         let allAds = [];
+        let currentCategory = 'Tudo';
 
-        // 🌡️ FUNÇÃO CLIMA (COORDENADAS NORTESHOPPING)
+        // 🌡️ CLIMA (NorteShopping)
         async function updateWeather() {
             try {
-                const lat = -22.8861; 
-                const lon = -43.2835;
-                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=America/Sao_Paulo`);
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=-22.8861&longitude=-43.2835&current_weather=true&timezone=America/Sao_Paulo`);
                 const data = await response.json();
                 const w = data.current_weather;
-
-                const codes = {
-                    0: ["☀️", "Céu Limpo"], 1: ["🌤️", "Poucas Nuvens"], 2: ["⛅", "Nublado"], 3: ["☁️", "Encoberto"],
-                    45: ["🌫️", "Nevoeiro"], 51: ["🌦️", "Garoa"], 61: ["🌧️", "Chuva"], 80: ["🌧️", "Pancadas de Chuva"], 95: ["⛈️", "Tempestade"]
-                };
-
+                const codes = { 0: ["☀️", "Céu Limpo"], 1: ["🌤️", "Poucas Nuvens"], 2: ["⛅", "Nublado"], 3: ["☁️", "Encoberto"], 61: ["🌧️", "Chuva"], 80: ["🌧️", "Pancadas"], 95: ["⛈️", "Tempestade"] };
                 const info = codes[w.weathercode] || ["🌡️", "Instável"];
                 document.getElementById('weatherTemp').innerText = `${Math.round(w.temperature)}°C`;
                 document.getElementById('weatherStatus').innerText = info[1];
                 document.getElementById('weatherEmoji').innerText = info[0];
                 document.getElementById('weatherArea').style.display = 'block';
-
                 const options = { weekday: 'long', day: 'numeric', month: 'short' };
-                const dt = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
-                document.getElementById('weatherDate').innerText = dt.charAt(0).toUpperCase() + dt.slice(1);
-            } catch (e) { console.error("Erro clima", e); }
+                document.getElementById('weatherDate').innerText = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
+            } catch (e) { console.error(e); }
         }
 
-        // 📋 CARREGAR ANÚNCIOS
+        // 📋 DADOS
         async function loadAds() {
-            const { data, error } = await sb.from('anuncios').select('*').order('criado_em', { ascending: false });
+            const { data } = await sb.from('anuncios').select('*').order('criado_em', { ascending: false });
             if (data) {
                 allAds = data;
-                renderAds(allAds);
+                render();
             }
         }
 
-        function renderAds(ads) {
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render();
+        }
+
+        function filterData() { render(); }
+
+        function render() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
             const feed = document.getElementById('adFeed');
-            feed.innerHTML = ads.map(ad => `
+            
+            const filtered = allAds.filter(ad => {
+                const matchCat = currentCategory === 'Tudo' || ad.categoria === currentCategory;
+                const matchTerm = ad.titulo.toLowerCase().includes(term) || ad.descricao.toLowerCase().includes(term);
+                return matchCat && matchTerm;
+            });
+
+            feed.innerHTML = filtered.map(ad => `
                 <div class="ad-card" onclick="window.open('https://wa.me/${ad.whatsapp}', '_blank')">
                     <img src="${ad.imagem_url || 'https://via.placeholder.com/80'}" class="ad-image">
                     <div class="ad-info">
                         <h3>${ad.titulo}</h3>
-                        <p>${ad.descricao.substring(0, 60)}...</p>
-                        <span style="font-size: 11px; color: var(--gold); font-weight: 700;">VER CONTATO</span>
+                        <p>${ad.descricao}</p>
+                        <span style="font-size: 10px; color: var(--gold); font-weight: 800;">VER WHATSAPP</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        function filterAds() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allAds.filter(ad => 
-                ad.titulo.toLowerCase().includes(term) || 
-                ad.descricao.toLowerCase().includes(term)
-            );
-            renderAds(filtered);
-        }
-
-        window.onload = () => {
-            updateWeather();
-            loadAds();
-        };
+        window.onload = () => { updateWeather(); loadAds(); };
     </script>
 </body>
 </html>
