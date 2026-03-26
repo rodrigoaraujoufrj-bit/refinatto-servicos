@@ -170,7 +170,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       <div class="field"><label>Categoria</label><select id="cadCatSel"></select></div>
       <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="4"></textarea></div>
       <div class="field">
-        <label>Fotos (Máx 6)</label>
+        <label>Fotos (Máx. 06 fotos)</label>
         <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('cadFile').click()">📸 Adicionar Fotos</button>
         <input type="file" id="cadFile" multiple accept="image/*" onchange="processPhotos(this, 'cad')" style="display:none;">
         <div id="cadPhotoGrid" class="photo-grid-common"></div>
