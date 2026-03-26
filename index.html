@@ -16,12 +16,7 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
   const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
-  let currentUser = null;
-  let currentData = [];
-  let itemPhotos = [];
-  let editingAdId = null;
-  let activeCat = '';
-  let tipoUsuario = 'morador';
+  let currentUser = null, currentData = [], itemPhotos = [], editingAdId = null, activeCat = '', tipoUsuario = 'morador';
 
   const CATEGORIAS_LISTA = [
     { nome: "Saúde", emoji: "🩺" }, { nome: "Beleza", emoji: "✂️" }, { nome: "Gastronomia", emoji: "🍽️" },
@@ -34,7 +29,7 @@
   ];
 </script>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -143,7 +138,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       <div class="field"><label>Categoria</label><select id="editInpCat"></select></div>
       <div class="field"><label>Descrição</label><textarea id="editInpDesc" rows="6"></textarea></div>
       <div class="field">
-        <label>Fotos</label>
+        <label>Fotos (Máx 6)</label>
         <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('editFile').click()">📸 Trocar/Add Fotos</button>
         <input type="file" id="editFile" multiple accept="image/*" onchange="processPhotos(this, 'edit')" style="display:none;">
         <div id="editPhotoGrid" class="photo-grid-common"></div>
@@ -175,7 +170,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
       <div class="field"><label>Categoria</label><select id="cadCatSel"></select></div>
       <div class="field"><label>Descrição</label><textarea id="cadDesc" rows="4"></textarea></div>
       <div class="field">
-        <label>Fotos</label>
+        <label>Fotos (Máx 6)</label>
         <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('cadFile').click()">📸 Adicionar Fotos</button>
         <input type="file" id="cadFile" multiple accept="image/*" onchange="processPhotos(this, 'cad')" style="display:none;">
         <div id="cadPhotoGrid" class="photo-grid-common"></div>
@@ -208,13 +203,12 @@ async function compress(b64) {
 
 function setupCats() {
   const bar = document.getElementById('catBar');
-  const selEdit = document.getElementById('editInpCat');
-  const selCad = document.getElementById('cadCatSel');
+  const sEdit = document.getElementById('editInpCat'), sCad = document.getElementById('cadCatSel');
   CATEGORIAS_LISTA.forEach(c => {
-    const pill = document.createElement('div'); pill.className = 'cat-pill'; pill.innerText = `${c.emoji} ${c.nome}`;
-    pill.style = "flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer;";
-    pill.onclick = () => filterByCat(pill, c.nome); bar.appendChild(pill);
-    [selEdit, selCad].forEach(s => { const o = document.createElement('option'); o.value = c.nome; o.innerText = `${c.emoji} ${c.nome}`; s.appendChild(o); });
+    const p = document.createElement('div'); p.className = 'cat-pill'; p.innerText = `${c.emoji} ${c.nome}`;
+    p.style = "flex-shrink:0; background:var(--card); border:1.5px solid var(--border); border-radius:100px; padding:8px 16px; font-size:12px; cursor:pointer;";
+    p.onclick = () => filterByCat(p, c.nome); bar.appendChild(p);
+    [sEdit, sCad].forEach(s => { const o = document.createElement('option'); o.value = c.nome; o.innerText = `${c.emoji} ${c.nome}`; s.appendChild(o); });
   });
 }
 
@@ -234,20 +228,13 @@ sb.auth.onAuthStateChange((event, session) => {
 
 async function loadAll() {
   const { data } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
-  currentData = data || [];
-  filterData();
-  if (currentUser) renderProfile();
-  
-  // DEEP LINKING CHECK
-  const params = new URLSearchParams(window.location.search);
-  const adId = params.get('ad');
-  if (adId) setTimeout(() => verDetalhes(adId), 600);
+  currentData = data || []; filterData(); if (currentUser) renderProfile();
+  const adId = new URLSearchParams(window.location.search).get('ad'); if (adId) setTimeout(() => verDetalhes(adId), 600);
 }
 
 function filterByCat(el, cat) {
     document.querySelectorAll('.cat-pill').forEach(c => { c.style.background = 'var(--card)'; c.style.color = 'var(--ink)'; });
-    el.style.background = 'var(--forest)'; el.style.color = 'white';
-    activeCat = cat; filterData();
+    el.style.background = 'var(--forest)'; el.style.color = 'white'; activeCat = cat; filterData();
 }
 
 function filterData() {
@@ -273,22 +260,14 @@ function renderFeed(list) {
 }
 
 function verDetalhes(id) {
-  const ad = currentData.find(a => a.id === id);
-  if (!ad) return;
-  
-  const url = new URL(window.location.href);
-  url.searchParams.set('ad', ad.id);
-  window.history.pushState({}, '', url);
-
-  editingAdId = id;
-  toggleEditMode(false);
+  const ad = currentData.find(a => a.id === id); if (!ad) return;
+  const url = new URL(window.location.href); url.searchParams.set('ad', ad.id); window.history.pushState({}, '', url);
+  editingAdId = id; toggleEditMode(false);
   document.getElementById('detTitle').innerText = ad.titulo;
   document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome}`;
   document.getElementById('detDesc').innerText = ad.descricao || "";
   document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;" loading="lazy">`).join('');
-  
   document.getElementById('btnShareLink').onclick = () => shareAd(ad);
-
   const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   if (isAdmin) {
     document.getElementById('adminTools').style.display = 'block';
@@ -297,16 +276,14 @@ function verDetalhes(id) {
     document.getElementById('btnOpenEdit').onclick = () => startEditing(ad);
     document.getElementById('btnDeleteAd').onclick = async () => { if(confirm("Apagar?")) { await sb.from('anuncios').delete().eq('id', id); loadAll(); closeModal('detailOverlay'); } };
   } else { document.getElementById('adminTools').style.display = 'none'; }
-  
   const zap = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
   document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${zap}?text=${encodeURIComponent('Oi, vi seu anúncio no Refinatto: '+ad.titulo)}`);
   document.getElementById('detailOverlay').classList.add('open');
 }
 
 async function shareAd(ad) {
-    const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('ad', ad.id);
-    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira os detalhes aqui:`;
+    const url = new URL(window.location.origin + window.location.pathname); url.searchParams.set('ad', ad.id);
+    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira:`;
     if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: url.toString() }); } catch (e) {} }
     else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado!"); }
 }
@@ -320,18 +297,16 @@ function startEditing(ad) {
   document.getElementById('editInpTitle').value = ad.titulo;
   document.getElementById('editInpCat').value = ad.categoria;
   document.getElementById('editInpDesc').value = ad.descricao;
-  itemPhotos = [...(ad.fotos || [])];
-  renderPhotos('edit');
-  toggleEditMode(true);
+  itemPhotos = [...(ad.fotos || [])]; renderPhotos('edit'); toggleEditMode(true);
 }
 
 async function processPhotos(input, mode) {
   const files = Array.from(input.files);
+  // LIMITE DE 6 FOTOS PARA NÃO TRAVAR O BANCO
+  if ((itemPhotos.length + files.length) > 6) { alert("Limite de 6 fotos por anúncio para garantir a velocidade."); return; }
   for (const f of files) {
     const b64 = await new Promise(r => { const reader = new FileReader(); reader.readAsDataURL(f); reader.onload = () => r(reader.result); });
-    const low = await compress(b64);
-    itemPhotos.push(low);
-    renderPhotos(mode);
+    const low = await compress(b64); itemPhotos.push(low); renderPhotos(mode);
   }
 }
 
@@ -373,15 +348,7 @@ async function salvarTudo() {
   await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCatSel').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
   alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); loadAll(); btn.innerText = "Publicar"; btn.disabled = false;
 }
-
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('open'); 
-  editingAdId = null; 
-  const url = new URL(window.location.href);
-  url.searchParams.delete('ad');
-  window.history.pushState({}, '', url);
-}
-
+function closeModal(id) { document.getElementById(id).classList.remove('open'); editingAdId = null; const u = new URL(window.location.href); u.searchParams.delete('ad'); window.history.pushState({}, '', u); }
 window.onload = () => { setupCats(); loadAll(); };
 </script>
 </body>
