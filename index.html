@@ -54,15 +54,15 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 5px; }
 
 /* 🌤️ WIDGET CLIMA & FINANCEIRO */
-.weather-widget { background: var(--paper); color: var(--forest); border: 1.5px solid var(--border); margin: 15px 20px; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-.weather-info { display: flex; flex-direction: column; }
+.weather-widget { background: white; color: var(--forest); border: 1.5px solid var(--border); margin: 15px 20px; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.weather-info { display: flex; flex-direction: column; flex: 1; }
 .weather-date { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
-.weather-temp { font-size: 28px; font-weight: 800; font-family: 'Playfair Display', serif; color: var(--ink); }
-.weather-status { font-size: 11px; font-weight: 600; }
+.weather-temp { font-size: 24px; font-weight: 800; font-family: 'Playfair Display', serif; color: var(--ink); }
+.weather-status { font-size: 11px; font-weight: 600; color: var(--muted); }
 
-.finance-info { text-align: right; display: flex; flex-direction: column; gap: 2px; }
-.finance-item { font-size: 11px; font-weight: 700; color: var(--ink); }
-.finance-label { font-size: 9px; color: var(--muted); text-transform: uppercase; }
+.finance-info { border-left: 1px solid var(--border); padding-left: 15px; text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.finance-item { font-size: 13px; font-weight: 800; color: var(--gold); }
+.finance-label { font-size: 9px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
 
 .search-container { padding: 0 20px; margin-top: -10px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -154,51 +154,349 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   <div class="plist" id="plist"></div>
 </div>
 
+<div id="pageMyAds" style="display:none; padding:20px;">
+    <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Painel de Controle</h2>
+    <div id="adminPanel" style="display:none; margin-bottom: 30px;">
+        <h3 style="font-size: 10px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">Pendentes de Aprovação</h3>
+        <div id="pendingList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border);">
+    </div>
+    <h3 style="font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">Meus Anúncios</h3>
+    <div id="myAdsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+    <button class="btn-primary" style="background:none; border:1px solid var(--border); color:var(--muted); margin-top:40px;" onclick="logout()">Sair da Conta</button>
+</div>
+
+<div class="overlay" id="detailOverlay">
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModal('detailOverlay')">✕</button>
+    <div id="viewMode">
+      <h2 id="detTitle" style="font-family:'Playfair Display', serif; margin-bottom:10px; font-size: 22px;"></h2>
+      <div id="detMeta" style="font-size:12px; color:var(--muted); margin-bottom:20px; font-weight: 600;"></div>
+      <div id="detPhotos" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; scrollbar-width: none;"></div>
+      <p id="detDesc" style="line-height:1.6; margin-bottom:24px; font-size:14px; color: #444; white-space: pre-wrap;"></p>
+      <button class="btn-share" id="btnShareLink" style="width:100%; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:14px; padding:12px; font-weight:600; cursor:pointer; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; gap:8px; font-size: 12px;">🔗 Compartilhar anúncio</button>
+      <div id="adminTools" style="display:none; background:var(--gold-pale); padding:15px; border-radius:20px; border:1.5px solid var(--gold-light); margin-bottom:20px;">
+        <button class="btn-primary" id="btnOpenEdit" style="background:var(--forest); color:white;">✏️ Corrigir Anúncio (Admin)</button>
+        <button class="btn-primary" id="btnQuickApprove" style="background:var(--forest-mid); color:white; display:none;">✔️ Aprovar Agora</button>
+        <button class="btn-primary" id="btnDeleteAd" style="background:var(--red); color:white; font-size:11px; margin-bottom: 0;">🗑️ Excluir para sempre</button>
+      </div>
+      <button class="btn-primary" id="detWppBtn" style="background:var(--wpp); color:white; margin-bottom: 0;">💬 Chamar no WhatsApp</button>
+    </div>
+    <div id="editMode" style="display:none;">
+      <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px;">Corrigir Anúncio</h2>
+      <div class="field"><label>Título</label><input type="text" id="editInpTitle"></div>
+      <div class="field"><label>Categoria</label><select id="editInpCat"></select></div>
+      <div class="field"><label>Descrição</label><textarea id="editInpDesc" rows="6"></textarea></div>
+      <div class="field">
+        <label>Fotos (Máx 6)</label>
+        <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('editFile').click()">📸 Trocar/Add Fotos</button>
+        <input type="file" id="editFile" multiple accept="image/*" onchange="processPhotos(this, 'edit')" style="display:none;">
+        <div id="editPhotoGrid" class="photo-grid-common"></div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1; margin-bottom: 0;" onclick="toggleEditMode(false)">Cancelar</button>
+        <button id="btnSaveEdit" class="btn-primary" style="flex:2; margin-bottom: 0;" onclick="saveChanges()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="cadOverlay">
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModal('cadOverlay')">✕</button>
+    <h2 style="font-family:'Playfair Display', serif; margin-bottom:20px; font-size: 22px;">Novo Anúncio</h2>
+    <div id="step0" class="cad-step">
+      <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <div id="optM" class="btn-primary" style="flex:1; background:var(--forest-light); color:var(--forest); text-align:center; margin-bottom: 0;" onclick="setTipo('morador')">Morador</div>
+        <div id="optF" class="btn-primary" style="flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); text-align:center; margin-bottom: 0;" onclick="setTipo('funcionario')">Funcionário</div>
+      </div>
+      <div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Nome</label><input type="text" id="cadNome"></div><div class="field" style="flex:1;"><label>Sobrenome</label><input type="text" id="cadSobrenome"></div></div>
+      <div id="fieldsMorador">
+        <div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label>Bloco</label><select id="cadBloco"><option>1</option><option>2</option><option>3</option><option>4</option></select></div><div class="field" style="flex:1;"><label>Apto</label><input type="text" id="cadApto" placeholder="101"></div></div>
+      </div>
+      <div id="fieldsFunc" style="display:none;">
+        <div class="field"><label>Setor / Empresa</label><input type="text" id="cadSetor" placeholder="Ex: Portaria, Limpeza, Admin"></div>
+      </div>
+      <div class="field"><label>WhatsApp</label><input type="tel" id="cadWpp" placeholder="21999999999"></div>
+      <button class="btn-primary" onclick="goStep(1)">Próximo Passo</button>
+    </div>
+    <div id="step1" class="cad-step" style="display:none;">
+      <div class="field"><label>Título do Anúncio</label><input type="text" id="cadTitulo" placeholder="Ex: Manicure Domicílio, Vendo Berço"></div>
+      <div class="field"><label>Categoria</label><select id="cadCatSel"></select></div>
+      <div class="field"><label>Descrição (Opcional)</label><textarea id="cadDesc" rows="4" placeholder="Detalhes, preços, horários..."></textarea></div>
+      <div class="field">
+        <label>Fotos (Máx 6)</label>
+        <button class="btn-primary" style="background:white; border:1.5px dashed var(--gold); color:var(--gold);" onclick="document.getElementById('cadFile').click()">📸 Adicionar Fotos</button>
+        <input type="file" id="cadFile" multiple accept="image/*" onchange="processPhotos(this, 'cad')" style="display:none;">
+        <div id="cadPhotoGrid" class="photo-grid-common"></div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-primary" style="background:#eee; color:var(--muted); flex:1; margin-bottom: 0;" onclick="goStep(0)">Voltar</button>
+        <button id="btnFinalizar" class="btn-primary" style="flex:2; margin-bottom: 0;" onclick="salvarTudo()">Publicar Anúncio</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-bottom">
+    <div class="nav-item active" id="navHomeBtn" onclick="showTab('home')"><span>🏠</span><span>Início</span></div>
+    <div class="nav-item" onclick="handleAnunciarClick()"><span>➕</span><span>Anunciar</span></div>
+    <div class="nav-item" id="navUserBtn" onclick="showTab('myads')"><span>👤</span><span>Perfil</span></div>
+</div>
+
 <script>
 // --- 🌡️ FUNÇÃO CLIMA + 💵 FINANCEIRO ---
 async function updateWeather() {
+  const weatherArea = document.getElementById('weatherArea');
+  
+  // 1. Atualizar Data (Imediato)
+  const options = { weekday: 'long', day: 'numeric', month: 'short' };
+  const dt = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
+  document.getElementById('weatherDate').innerText = dt.charAt(0).toUpperCase() + dt.slice(1);
+  weatherArea.style.display = 'flex';
+
+  // 2. Buscar Clima (NorteShopping)
   try {
-    const lat = -22.8861; const lon = -43.2835;
-    
-    // Busca Clima
-    const weatherReq = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=America/Sao_Paulo`);
-    // Busca Câmbio (AwesomeAPI)
-    const financeReq = fetch(`https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL`);
-
-    const [wRes, fRes] = await Promise.all([weatherReq, financeReq]);
+    const lat = -22.8861, lon = -43.2835;
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=America/Sao_Paulo`);
     const wData = await wRes.json();
-    const fData = await fRes.json();
-
-    // Render Clima
     const w = wData.current_weather;
-    const codes = {
-      0: ["☀️", "Céu Limpo"], 1: ["🌤️", "Poucas Nuvens"], 2: ["⛅", "Nublado"], 3: ["☁️", "Encoberto"],
-      45: ["🌫️", "Nevoeiro"], 51: ["🌦️", "Garoa"], 61: ["🌧️", "Chuva"], 80: ["🌧️", "Pancadas"], 95: ["⛈️", "Tempestade"]
-    };
-    const info = codes[w.weathercode] || ["🌡️", "Instável"];
+    const codes = { 0: "Céu Limpo", 1: "Poucas Nuvens", 2: "Nublado", 3: "Encoberto", 61: "Chuva", 80: "Pancadas", 95: "Tempestade" };
     document.getElementById('weatherTemp').innerText = `${Math.round(w.temperature)}°C`;
-    document.getElementById('weatherStatus').innerText = info[1];
-    document.getElementById('weatherArea').style.display = 'flex';
-    
-    const options = { weekday: 'long', day: 'numeric', month: 'short' };
-    const dt = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
-    document.getElementById('weatherDate').innerText = dt.charAt(0).toUpperCase() + dt.slice(1);
+    document.getElementById('weatherStatus').innerText = codes[w.weathercode] || "Instável";
+  } catch (e) { document.getElementById('weatherStatus').innerText = "Clima indisponível"; }
 
-    // Render Financeiro
+  // 3. Buscar Dólar e Euro (AwesomeAPI)
+  try {
+    const fRes = await fetch(`https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL`);
+    const fData = await fRes.json();
     document.getElementById('usdValue').innerText = `R$ ${parseFloat(fData.USDBRL.bid).toFixed(2).replace('.',',')}`;
     document.getElementById('eurValue').innerText = `R$ ${parseFloat(fData.EURBRL.bid).toFixed(2).replace('.',',')}`;
-
-  } catch (e) { console.error("Erro clima/financeiro", e); }
+  } catch (e) { document.getElementById('financeArea').style.display = 'none'; }
 }
 
-// --- FUNÇÕES SUPABASE E CARROSSEL (COMO NO SEU ORIGINAL) ---
-// [Copie suas funções loadBanners, compress, setupCats, etc aqui]
+let bannerIndex = 0; let carouselInterval = null;
+async function loadBanners() {
+  const { data: banners } = await sb.from('publicidade').select('*').eq('ativo', true).order('ordem', { ascending: true });
+  const container = document.getElementById('pubSection');
+  if (banners && banners.length > 0) {
+    container.innerHTML = `<div class="banner-carousel"><div class="banner-track" id="bannerTrack">${banners.map(b => `<div class="banner-slide" onclick="window.open('${b.link_destino}', '_blank')"><img src="${b.imagem_url}" loading="lazy"></div>`).join('')}</div><div class="banner-dots" id="bannerDots"></div></div>`;
+    startCarouselLogic(banners.length);
+  } else {
+    container.innerHTML = `<div class="pub-banner-recruitment"><div class="pub-title">Espaço Premium 🌟</div><div class="pub-sub">Em breve novidades para este espaço...</div></div>`;
+  }
+}
 
-window.onload = () => { 
-  setupCats(); 
-  updateWeather(); // Atualiza Clima e Dólar juntos
-  loadAll(); 
-};
+function startCarouselLogic(count) {
+  if (count <= 1) return;
+  const track = document.getElementById('bannerTrack'); const dots = document.getElementById('bannerDots');
+  if(carouselInterval) clearInterval(carouselInterval); dots.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : '');
+    dots.appendChild(d);
+  }
+  carouselInterval = setInterval(() => {
+    bannerIndex = (bannerIndex + 1) % count;
+    if(track) track.style.transform = `translateX(-${bannerIndex * 100}%)`;
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === bannerIndex));
+  }, 5000);
+}
+
+async function compress(b64) {
+  return new Promise(res => {
+    const img = new Image(); img.src = b64;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > 1024) { h = (1024 / w) * h; w = 1024; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+      res(canvas.toDataURL('image/jpeg', 0.7));
+    };
+  });
+}
+
+function setupCats() {
+  const bar = document.getElementById('catBar');
+  const sEdit = document.getElementById('editInpCat'), sCad = document.getElementById('cadCatSel');
+  CATEGORIAS_LISTA.forEach(c => {
+    const p = document.createElement('div'); p.className = 'cat-pill'; p.innerText = `${c.emoji} ${c.nome}`;
+    p.onclick = () => filterByCat(p, c.nome); bar.appendChild(p);
+    [sEdit, sCad].forEach(s => { const o = document.createElement('option'); o.value = c.nome; o.innerText = `${c.emoji} ${c.nome}`; s.appendChild(o); });
+  });
+}
+
+async function loginGoogle() { 
+  const btn = document.getElementById('btnLogin'); btn.innerText = "⏳..."; btn.disabled = true;
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
+}
+async function logout() { await sb.auth.signOut(); window.location.reload(); }
+
+sb.auth.onAuthStateChange((event, session) => {
+  currentUser = session?.user || null;
+  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
+  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
+  if (currentUser) {
+    document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0]);
+    if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) document.getElementById('adminPanel').style.display = 'block';
+  }
+  loadAll();
+});
+
+async function loadAll() {
+  const { data, error } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
+  if(error) { console.error(error); return; }
+  currentData = data || []; 
+  filterData(); 
+  if (currentUser) renderProfile();
+  loadBanners();
+  const adId = new URLSearchParams(window.location.search).get('ad'); if (adId) setTimeout(() => verDetalhes(adId), 600);
+}
+
+function filterByCat(el, cat) {
+    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+    el.classList.add('active'); activeCat = cat; filterData();
+}
+
+function filterData() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    let list = currentData;
+    if (!isAdmin) list = list.filter(a => a.aprovado);
+    if (activeCat) list = list.filter(i => i.categoria === activeCat);
+    if (term) list = list.filter(i => (i.titulo || "").toLowerCase().includes(term));
+    renderFeed(list);
+}
+
+function renderFeed(list) {
+  const container = document.getElementById('plist');
+  container.innerHTML = list.map(item => {
+    const thumb = (item.fotos?.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}" loading="lazy">` : '';
+    const uPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
+    const loc = item.usuarios?.tipo === 'morador' ? `B${item.usuarios.bloco}` : item.usuarios?.setor || 'Vizinho';
+    return `<div class="pcard" onclick="verDetalhes('${item.id}')">
+      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${uPhoto}" loading="lazy"></div>
+      <div class="pcard-body">
+        <div class="pcard-name">${item.titulo}</div>
+        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc}</div>
+        ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
+      </div>
+      ${thumb}
+    </div>`
+  }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted); font-size: 12px;">Nenhum anúncio encontrado.</p>';
+}
+
+function verDetalhes(id) {
+  const ad = currentData.find(a => a.id === id); if (!ad) return;
+  const url = new URL(window.location.href); url.searchParams.set('ad', ad.id); window.history.pushState({}, '', url);
+  editingAdId = id; toggleEditMode(false);
+  document.getElementById('detTitle').innerText = ad.titulo;
+  const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor || '';
+  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
+  document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição adicional.";
+  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;" loading="lazy">`).join('');
+  document.getElementById('btnShareLink').onclick = () => shareAd(ad);
+  const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  if (isAdmin) {
+    document.getElementById('adminTools').style.display = 'block';
+    document.getElementById('btnQuickApprove').style.display = ad.aprovado ? 'none' : 'block';
+    document.getElementById('btnQuickApprove').onclick = async () => { if(confirm("Aprovar?")) { await sb.from('anuncios').update({ aprovado: true }).eq('id', id); loadAll(); closeModal('detailOverlay'); } };
+    document.getElementById('btnOpenEdit').onclick = () => startEditing(ad);
+    document.getElementById('btnDeleteAd').onclick = async () => { if(confirm("EXCLUIR?")) { await sb.from('anuncios').delete().eq('id', id); loadAll(); closeModal('detailOverlay'); } };
+  } else { document.getElementById('adminTools').style.display = 'none'; }
+  const zap = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
+  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${zap}?text=${encodeURIComponent('Oi '+ad.usuarios?.nome+', vi seu anúncio no Refinatto: '+ad.titulo)}`);
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+async function shareAd(ad) {
+    const url = new URL(window.location.origin + window.location.pathname); url.searchParams.set('ad', ad.id);
+    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira os detalhes:`;
+    if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: url.toString() }); } catch (e) {} }
+    else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado!"); }
+}
+
+function toggleEditMode(on) {
+  document.getElementById('viewMode').style.display = on ? 'none' : 'block';
+  document.getElementById('editMode').style.display = on ? 'block' : 'none';
+}
+
+function startEditing(ad) {
+  document.getElementById('editInpTitle').value = ad.titulo;
+  document.getElementById('editInpCat').value = ad.categoria;
+  document.getElementById('editInpDesc').value = ad.descricao;
+  itemPhotos = [...(ad.fotos || [])]; renderPhotos('edit'); toggleEditMode(true);
+}
+
+async function saveChanges() {
+  const btn = document.getElementById('btnSaveEdit'); btn.innerText = "⏳..."; btn.disabled = true;
+  await sb.from('anuncios').update({ titulo: document.getElementById('editInpTitle').value, categoria: document.getElementById('editInpCat').value, descricao: document.getElementById('editInpDesc').value, fotos: itemPhotos, aprovado: true }).eq('id', editingAdId);
+  alert("Atualizado!"); loadAll(); closeModal('detailOverlay');
+  btn.innerText = "Salvar Alterações"; btn.disabled = false;
+}
+
+async function processPhotos(input, mode) {
+  const files = Array.from(input.files);
+  if ((itemPhotos.length + files.length) > 6) { alert("Máx 6 fotos."); return; }
+  const btn = input.previousElementSibling; const originalText = btn.innerText;
+  btn.innerText = "⏳..."; btn.disabled = true;
+  for (const f of files) {
+    const b64 = await new Promise(r => { const reader = new FileReader(); reader.readAsDataURL(f); reader.onload = () => r(reader.result); });
+    const low = await compress(b64); itemPhotos.push(low); renderPhotos(mode);
+  }
+  btn.innerText = originalText; btn.disabled = false; input.value = '';
+}
+
+function renderPhotos(mode) {
+  const grid = document.getElementById(mode === 'edit' ? 'editPhotoGrid' : 'cadPhotoGrid');
+  grid.innerHTML = itemPhotos.map((s, i) => `<div class="photo-item"><img src="${s}"><button class="btn-del-photo" onclick="itemPhotos.splice(${i},1); renderPhotos('${mode}');">✕</button></div>`).join('');
+}
+
+function setTipo(t) { 
+    tipoUsuario = t; 
+    document.getElementById('optM').style = t === 'morador' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
+    document.getElementById('optF').style = t === 'funcionario' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
+    document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
+    document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
+}
+
+async function salvarTudo() {
+  if(!document.getElementById('cadTitulo').value || itemPhotos.length === 0) { alert("Título e foto obrigatórios."); return; }
+  const btn = document.getElementById('btnFinalizar'); btn.innerText = "⏳..."; btn.disabled = true;
+  const u = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, foto_url: currentUser.user_metadata.avatar_url };
+  await sb.from('usuarios').upsert(u);
+  await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCatSel').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
+  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); loadAll();
+  btn.innerText = "Publicar Anúncio"; btn.disabled = false;
+}
+
+function renderProfile() {
+  const meus = currentData.filter(ad => ad.usuario_id === currentUser.id);
+  document.getElementById('myAdsList').innerHTML = meus.map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Sem anúncios.</p>';
+  if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    const pendentes = currentData.filter(ad => !ad.aprovado);
+    document.getElementById('pendingList').innerHTML = pendentes.map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px;">De: ${ad.usuarios?.nome}</span></div></div>`).join('') || '<p style="font-size:12px;">✅ Tudo revisado!</p>';
+  }
+}
+
+function showTab(t) {
+  document.getElementById('pageHome').style.display = t === 'home' ? 'block' : 'none';
+  document.getElementById('pageMyAds').style.display = t === 'myads' ? 'block' : 'none';
+  document.getElementById('navHomeBtn').classList.toggle('active', t === 'home');
+  document.getElementById('navUserBtn').classList.toggle('active', t === 'myads');
+}
+
+function handleAnunciarClick() { 
+  if (!currentUser) { alert("Logue para anunciar."); loginGoogle(); } 
+  else { itemPhotos = []; renderPhotos('cad'); goStep(0); document.getElementById('cadOverlay').classList.add('open'); } 
+}
+function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.style.display = i === n ? 'block' : 'none'); }
+function closeModal(id) { 
+  document.getElementById(id).classList.remove('open'); editingAdId = null; 
+  const u = new URL(window.location.href); u.searchParams.delete('ad'); window.history.pushState({}, '', u); 
+}
+
+window.onload = () => { setupCats(); updateWeather(); loadAll(); };
 </script>
 </body>
 </html>
