@@ -16,7 +16,6 @@
   const SUPABASE_KEY = 'sb_publishable_iNtDghLkTdaR_7ivvM3Ipw_HHijgbIL' 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   
-  // ✅ CONFIGURAÇÃO ADMIN
   const ADMIN_EMAIL = 'rodrigoaraujo.ufrj@gmail.com';
   const WHATSAPP_ADMIN = '5521982734393'; 
   
@@ -54,36 +53,14 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .hero h1 { font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; margin-bottom: 5px; }
 
 /* 🌤️ WIDGET CLIMA & FINANCEIRO PADRONIZADO */
-.weather-widget { 
-  background: white; 
-  color: var(--forest); 
-  border: 1.5px solid var(--border); 
-  margin: 15px 20px; 
-  padding: 16px; 
-  border-radius: 20px; 
-  display: flex; 
-  align-items: center; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
-}
-.weather-info { 
-  display: flex; 
-  flex-direction: column; 
-  flex: 1.2; 
-}
+.weather-widget { background: white; color: var(--forest); border: 1.5px solid var(--border); margin: 15px 20px; padding: 16px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.weather-info { display: flex; flex-direction: column; flex: 1.2; }
 .weather-date { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
 .weather-temp { font-size: 26px; font-weight: 800; font-family: 'Playfair Display', serif; color: var(--ink); line-height: 1.1; margin: 2px 0; }
 .weather-status { font-size: 11px; font-weight: 600; color: var(--muted); }
 .rain-prob { font-size: 10px; font-weight: 700; color: #3498db; margin-top: 2px; }
 
-/* Grade Financeira preenchendo o lado direito */
-.finance-info { 
-  border-left: 1px solid var(--border); 
-  padding-left: 15px; 
-  flex: 2; 
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap: 8px 12px; 
-}
+.finance-info { border-left: 1px solid var(--border); padding-left: 15px; flex: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
 .finance-box { display: flex; flex-direction: column; text-align: right; }
 .finance-item { font-size: 12px; font-weight: 800; color: var(--gold); }
 .finance-label { font-size: 8px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
@@ -111,7 +88,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* Restante do CSS mantido... */
+/* Modais e UI */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; display:none; padding:15px; overflow-y:auto; }
 .overlay.open { display:flex; align-items: flex-start; justify-content: center; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; width: 100%; max-width: 410px; position: relative; margin: 20px 0; }
@@ -145,7 +122,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 <div id="pageHome">
   <div class="hero"><h1>Serviços & anúncios<br>dos seus <em>vizinhos</em></h1></div>
   
-  <div id="weatherArea" style="display:none;">
+  <div id="weatherArea">
     <div class="weather-widget">
       <div class="weather-info">
         <span class="weather-date" id="weatherDate">--</span>
@@ -180,262 +157,107 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
   <div class="plist" id="plist"></div>
 </div>
 
-<script>
-async function updateWeather() {
-  const weatherArea = document.getElementById('weatherArea');
-  const options = { weekday: 'long', day: 'numeric', month: 'short' };
-  const dt = new Intl.DateTimeFormat('pt-BR', options).format(new Date());
-  document.getElementById('weatherDate').innerText = dt.charAt(0).toUpperCase() + dt.slice(1);
-  weatherArea.style.display = 'flex';
+<div class="overlay" id="detailOverlay">...</div>
+<div class="overlay" id="cadOverlay">...</div>
 
+<div class="nav-bottom">
+    <div class="nav-item active" id="navHomeBtn" onclick="showTab('home')"><span>🏠</span><span>Início</span></div>
+    <div class="nav-item" onclick="handleAnunciarClick()"><span>➕</span><span>Anunciar</span></div>
+    <div class="nav-item" id="navUserBtn" onclick="showTab('myads')"><span>👤</span><span>Perfil</span></div>
+</div>
+
+<script>
+// --- ⚙️ FINANCEIRO E CLIMA (ISOLADOS PARA NÃO TRAVAR) ---
+async function updateFinance() {
+  try {
+    const res = await fetch(`https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL,BTC-BRL`);
+    const d = await res.json();
+    document.getElementById('usdValue').innerText = parseFloat(d.USDBRL.bid).toFixed(2);
+    document.getElementById('eurValue').innerText = parseFloat(d.EURBRL.bid).toFixed(2);
+    document.getElementById('gbpValue').innerText = parseFloat(d.GBPBRL.bid).toFixed(2);
+    const btcVal = parseFloat(d.BTCBRL.bid);
+    document.getElementById('btcValue').innerText = btcVal > 1000 ? Math.round(btcVal/1000) + 'k' : btcVal;
+  } catch (e) { console.error("Erro câmbio", e); }
+}
+
+async function updateWeather() {
   try {
     const lat = -22.8861, lon = -43.2835;
-    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=precipitation_probability&timezone=America/Sao_Paulo`);
-    const wData = await wRes.json();
-    const w = wData.current_weather;
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=precipitation_probability&timezone=America/Sao_Paulo`);
+    const d = await res.json();
     const codes = { 0: "Céu Limpo", 1: "Poucas Nuvens", 2: "Nublado", 3: "Encoberto", 61: "Chuva", 80: "Pancadas", 95: "Tempestade" };
-    const hourIndex = new Date().getHours();
-    const probChuva = wData.hourly.precipitation_probability[hourIndex];
-    document.getElementById('weatherTemp').innerText = `${Math.round(w.temperature)}°C`;
-    document.getElementById('weatherStatus').innerText = codes[w.weathercode] || "Instável";
-    document.getElementById('rainProb').innerText = `☔ ${probChuva}% chuva`;
-  } catch (e) { document.getElementById('weatherStatus').innerText = "Erro clima"; }
-
-  try {
-    const fRes = await fetch(`https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL,BTC-BRL`);
-    const fData = await fRes.json();
-    document.getElementById('usdValue').innerText = `${parseFloat(fData.USDBRL.bid).toFixed(2)}`;
-    document.getElementById('eurValue').innerText = `${parseFloat(fData.EURBRL.bid).toFixed(2)}`;
-    document.getElementById('gbpValue').innerText = `${parseFloat(fData.GBPBRL.bid).toFixed(2)}`;
+    document.getElementById('weatherTemp').innerText = Math.round(d.current_weather.temperature) + '°C';
+    document.getElementById('weatherStatus').innerText = codes[d.current_weather.weathercode] || "Instável";
+    document.getElementById('rainProb').innerText = `☔ ${d.hourly.precipitation_probability[new Date().getHours()]}% chuva`;
     
-    // BTC costuma ser um valor alto, então formatamos diferente
-    const btcVal = parseFloat(fData.BTCBRL.bid);
-    document.getElementById('btcValue').innerText = btcVal > 1000 ? Math.round(btcVal/1000) + 'k' : btcVal;
-  } catch (e) { document.getElementById('financeArea').style.display = 'none'; }
+    const dt = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' }).format(new Date());
+    document.getElementById('weatherDate').innerText = dt.toUpperCase();
+  } catch (e) { console.error("Erro clima", e); }
 }
 
-// Funções de backup do código original...
-let bannerIndex = 0; let carouselInterval = null;
-async function loadBanners() {
-  const { data: banners } = await sb.from('publicidade').select('*').eq('ativo', true).order('ordem', { ascending: true });
-  const container = document.getElementById('pubSection');
-  if (banners && banners.length > 0) {
-    container.innerHTML = `<div class="banner-carousel"><div class="banner-track" id="bannerTrack">${banners.map(b => `<div class="banner-slide" onclick="window.open('${b.link_destino}', '_blank')"><img src="${b.imagem_url}" loading="lazy"></div>`).join('')}</div><div class="banner-dots" id="bannerDots"></div></div>`;
-    startCarouselLogic(banners.length);
-  } else {
-    container.innerHTML = `<div class="pub-banner-recruitment"><div class="pub-title">Espaço Premium 🌟</div><div class="pub-sub">Em breve novidades para este espaço...</div></div>`;
-  }
-}
-function startCarouselLogic(count) {
-  if (count <= 1) return;
-  const track = document.getElementById('bannerTrack'); const dots = document.getElementById('bannerDots');
-  if(carouselInterval) clearInterval(carouselInterval); dots.innerHTML = '';
-  for (let i = 0; i < count; i++) {
-    const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : '');
-    dots.appendChild(d);
-  }
-  carouselInterval = setInterval(() => {
-    bannerIndex = (bannerIndex + 1) % count;
-    if(track) track.style.transform = `translateX(-${bannerIndex * 100}%)`;
-    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === bannerIndex));
-  }, 5000);
-}
-
-async function compress(b64) {
-  return new Promise(res => {
-    const img = new Image(); img.src = b64;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > 1024) { h = (1024 / w) * h; w = 1024; }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-      res(canvas.toDataURL('image/jpeg', 0.7));
-    };
-  });
-}
-
+// --- 📋 CATEGORIAS ---
 function setupCats() {
   const bar = document.getElementById('catBar');
-  const sEdit = document.getElementById('editInpCat'), sCad = document.getElementById('cadCatSel');
   CATEGORIAS_LISTA.forEach(c => {
-    const p = document.createElement('div'); p.className = 'cat-pill'; p.innerText = `${c.emoji} ${c.nome}`;
-    p.onclick = () => filterByCat(p, c.nome); bar.appendChild(p);
-    [sEdit, sCad].forEach(s => { const o = document.createElement('option'); o.value = c.nome; o.innerText = `${c.emoji} ${c.nome}`; s.appendChild(o); });
+    const p = document.createElement('div');
+    p.className = 'cat-pill';
+    p.innerText = `${c.emoji} ${c.nome}`;
+    p.onclick = () => filterByCat(p, c.nome);
+    bar.appendChild(p);
   });
 }
 
-async function loginGoogle() { 
-  const btn = document.getElementById('btnLogin'); btn.innerText = "⏳..."; btn.disabled = true;
-  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } }); 
-}
-async function logout() { await sb.auth.signOut(); window.location.reload(); }
+// --- 🔐 AUTH E SUPABASE ---
+async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google' }); }
 
 sb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
-  document.getElementById('btnLogin').style.display = currentUser ? 'none' : 'block';
-  document.getElementById('userHeader').style.display = currentUser ? 'block' : 'none';
   if (currentUser) {
-    document.getElementById('userHeader').innerText = "Olá, " + (currentUser.user_metadata.full_name.split(' ')[0]);
-    if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('userHeader').style.display = 'block';
+    document.getElementById('userHeader').innerText = "Olá, " + currentUser.user_metadata.full_name.split(' ')[0];
   }
   loadAll();
 });
 
 async function loadAll() {
-  const { data, error } = await sb.from('anuncios').select('*, usuarios(*)').order('criado_em', { ascending: false });
-  if(error) { console.error(error); return; }
-  currentData = data || []; 
-  filterData(); 
-  if (currentUser) renderProfile();
-  loadBanners();
-  const adId = new URLSearchParams(window.location.search).get('ad'); if (adId) setTimeout(() => verDetalhes(adId), 600);
+  const { data } = await sb.from('anuncios').select('*, usuarios(*)').eq('aprovado', true).order('criado_em', { ascending: false });
+  currentData = data || [];
+  filterData();
 }
 
 function filterByCat(el, cat) {
-    document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-    el.classList.add('active'); activeCat = cat; filterData();
+  document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+  el.classList.add('active'); activeCat = cat; filterData();
 }
 
 function filterData() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    let list = currentData;
-    if (!isAdmin) list = list.filter(a => a.aprovado);
-    if (activeCat) list = list.filter(i => i.categoria === activeCat);
-    if (term) list = list.filter(i => (i.titulo || "").toLowerCase().includes(term));
-    renderFeed(list);
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  let list = currentData;
+  if (activeCat) list = list.filter(i => i.categoria === activeCat);
+  if (term) list = list.filter(i => i.titulo.toLowerCase().includes(term));
+  renderFeed(list);
 }
 
 function renderFeed(list) {
-  const container = document.getElementById('plist');
-  container.innerHTML = list.map(item => {
-    const thumb = (item.fotos?.length > 0) ? `<img class="pcard-thumb" src="${item.fotos[0]}" loading="lazy">` : '';
-    const uPhoto = item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`;
-    const loc = item.usuarios?.tipo === 'morador' ? `B${item.usuarios.bloco}` : item.usuarios?.setor || 'Vizinho';
-    return `<div class="pcard" onclick="verDetalhes('${item.id}')">
-      <div class="pcard-profile-wrapper"><img class="pcard-profile-img" src="${uPhoto}" loading="lazy"></div>
-      <div class="pcard-body">
+  const feed = document.getElementById('plist');
+  feed.innerHTML = list.map(item => `
+    <div class="pcard" onclick="verDetalhes('${item.id}')">
+      <div style="flex:1">
         <div class="pcard-name">${item.titulo}</div>
-        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • ${loc}</div>
-        ${!item.aprovado ? '<span class="status-pill status-pending">Pendente</span>' : ''}
+        <div class="pcard-sub">${item.usuarios?.nome || 'Vizinho'} • B${item.usuarios?.bloco || '1'}</div>
       </div>
-      ${thumb}
-    </div>`
-  }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted); font-size: 12px;">Nenhum anúncio encontrado.</p>';
+      ${item.fotos?.length ? `<img src="${item.fotos[0]}" class="pcard-thumb">` : ''}
+    </div>
+  `).join('');
 }
 
-function verDetalhes(id) {
-  const ad = currentData.find(a => a.id === id); if (!ad) return;
-  const url = new URL(window.location.href); url.searchParams.set('ad', ad.id); window.history.pushState({}, '', url);
-  editingAdId = id; toggleEditMode(false);
-  document.getElementById('detTitle').innerText = ad.titulo;
-  const loc = ad.usuarios?.tipo === 'morador' ? `Bloco ${ad.usuarios.bloco} • Apto ${ad.usuarios.apartamento}` : ad.usuarios?.setor || '';
-  document.getElementById('detMeta').innerText = `${ad.categoria} • ${ad.usuarios?.nome} (${loc})`;
-  document.getElementById('detDesc').innerText = ad.descricao || "Sem descrição adicional.";
-  document.getElementById('detPhotos').innerHTML = (ad.fotos || []).map(f => `<img src="${f}" style="height:180px; border-radius:12px; object-fit:cover;" loading="lazy">`).join('');
-  document.getElementById('btnShareLink').onclick = () => shareAd(ad);
-  const isAdmin = currentUser?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  if (isAdmin) {
-    document.getElementById('adminTools').style.display = 'block';
-    document.getElementById('btnQuickApprove').style.display = ad.aprovado ? 'none' : 'block';
-    document.getElementById('btnQuickApprove').onclick = async () => { if(confirm("Aprovar?")) { await sb.from('anuncios').update({ aprovado: true }).eq('id', id); loadAll(); closeModal('detailOverlay'); } };
-    document.getElementById('btnOpenEdit').onclick = () => startEditing(ad);
-    document.getElementById('btnDeleteAd').onclick = async () => { if(confirm("EXCLUIR?")) { await sb.from('anuncios').delete().eq('id', id); loadAll(); closeModal('detailOverlay'); } };
-  } else { document.getElementById('adminTools').style.display = 'none'; }
-  const zap = (ad.usuarios?.whatsapp || '').replace(/\D/g,'');
-  document.getElementById('detWppBtn').onclick = () => window.open(`https://wa.me/55${zap}?text=${encodeURIComponent('Oi '+ad.usuarios?.nome+', vi seu anúncio no Refinatto: '+ad.titulo)}`);
-  document.getElementById('detailOverlay').classList.add('open');
-}
-
-async function shareAd(ad) {
-    const url = new URL(window.location.origin + window.location.pathname); url.searchParams.set('ad', ad.id);
-    const txt = `🏘️ *REFINATTO SERVIÇOS*\n\n🌟 *${ad.titulo.toUpperCase()}*\n\nConfira os detalhes:`;
-    if (navigator.share) { try { await navigator.share({ title: ad.titulo, text: txt, url: url.toString() }); } catch (e) {} }
-    else { await navigator.clipboard.writeText(txt + "\n" + url.toString()); alert("Link copiado!"); }
-}
-
-function toggleEditMode(on) {
-  document.getElementById('viewMode').style.display = on ? 'none' : 'block';
-  document.getElementById('editMode').style.display = on ? 'block' : 'none';
-}
-
-function startEditing(ad) {
-  document.getElementById('editInpTitle').value = ad.titulo;
-  document.getElementById('editInpCat').value = ad.categoria;
-  document.getElementById('editInpDesc').value = ad.descricao;
-  itemPhotos = [...(ad.fotos || [])]; renderPhotos('edit'); toggleEditMode(true);
-}
-
-async function saveChanges() {
-  const btn = document.getElementById('btnSaveEdit'); btn.innerText = "⏳..."; btn.disabled = true;
-  await sb.from('anuncios').update({ titulo: document.getElementById('editInpTitle').value, categoria: document.getElementById('editInpCat').value, descricao: document.getElementById('editInpDesc').value, fotos: itemPhotos, aprovado: true }).eq('id', editingAdId);
-  alert("Atualizado!"); loadAll(); closeModal('detailOverlay');
-  btn.innerText = "Salvar Alterações"; btn.disabled = false;
-}
-
-async function processPhotos(input, mode) {
-  const files = Array.from(input.files);
-  if ((itemPhotos.length + files.length) > 6) { alert("Máx 6 fotos."); return; }
-  const btn = input.previousElementSibling; const originalText = btn.innerText;
-  btn.innerText = "⏳..."; btn.disabled = true;
-  for (const f of files) {
-    const b64 = await new Promise(r => { const reader = new FileReader(); reader.readAsDataURL(f); reader.onload = () => r(reader.result); });
-    const low = await compress(b64); itemPhotos.push(low); renderPhotos(mode);
-  }
-  btn.innerText = originalText; btn.disabled = false; input.value = '';
-}
-
-function renderPhotos(mode) {
-  const grid = document.getElementById(mode === 'edit' ? 'editPhotoGrid' : 'cadPhotoGrid');
-  grid.innerHTML = itemPhotos.map((s, i) => `<div class="photo-item"><img src="${s}"><button class="btn-del-photo" onclick="itemPhotos.splice(${i},1); renderPhotos('${mode}');">✕</button></div>`).join('');
-}
-
-function setTipo(t) { 
-    tipoUsuario = t; 
-    document.getElementById('optM').style = t === 'morador' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
-    document.getElementById('optF').style = t === 'funcionario' ? 'flex:1; background:var(--forest-light); color:var(--forest); margin-bottom: 0;' : 'flex:1; background:white; color:var(--muted); border:1.5px solid var(--border); margin-bottom: 0;';
-    document.getElementById('fieldsMorador').style.display = t === 'morador' ? 'block' : 'none'; 
-    document.getElementById('fieldsFunc').style.display = t === 'funcionario' ? 'block' : 'none'; 
-}
-
-async function salvarTudo() {
-  if(!document.getElementById('cadTitulo').value || itemPhotos.length === 0) { alert("Título e foto obrigatórios."); return; }
-  const btn = document.getElementById('btnFinalizar'); btn.innerText = "⏳..."; btn.disabled = true;
-  const u = { id: currentUser.id, email: currentUser.email, nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value, whatsapp: document.getElementById('cadWpp').value, tipo: tipoUsuario, bloco: tipoUsuario === 'morador' ? document.getElementById('cadBloco').value : null, apartamento: tipoUsuario === 'morador' ? document.getElementById('cadApto').value : null, setor: tipoUsuario === 'funcionario' ? document.getElementById('cadSetor').value : null, foto_url: currentUser.user_metadata.avatar_url };
-  await sb.from('usuarios').upsert(u);
-  await sb.from('anuncios').insert([{ usuario_id: currentUser.id, titulo: document.getElementById('cadTitulo').value, categoria: document.getElementById('cadCatSel').value, descricao: document.getElementById('cadDesc').value, fotos: itemPhotos, aprovado: false }]);
-  alert("Enviado para aprovação!"); itemPhotos = []; closeModal('cadOverlay'); loadAll();
-  btn.innerText = "Publicar Anúncio"; btn.disabled = false;
-}
-
-function renderProfile() {
-  const meus = currentData.filter(ad => ad.usuario_id === currentUser.id);
-  document.getElementById('myAdsList').innerHTML = meus.map(ad => `<div style="background:white; padding:15px; border-radius:18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span class="status-pill ${ad.aprovado ? 'status-approved' : 'status-pending'}">${ad.aprovado ? 'Ativo' : 'Pendente'}</span></div></div>`).join('') || '<p style="font-size:12px; opacity:0.5;">Sem anúncios.</p>';
-  if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    const pendentes = currentData.filter(ad => !ad.aprovado);
-    document.getElementById('pendingList').innerHTML = pendentes.map(ad => `<div style="background:#FFF9E6; padding:15px; border-radius:18px; border:1px solid #FFD966; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="verDetalhes('${ad.id}')"><div style="flex:1"><strong>${ad.titulo}</strong><br><span style="font-size:10px;">De: ${ad.usuarios?.nome}</span></div></div>`).join('') || '<p style="font-size:12px;">✅ Tudo revisado!</p>';
-  }
-}
-
-function showTab(t) {
-  document.getElementById('pageHome').style.display = t === 'home' ? 'block' : 'none';
-  document.getElementById('pageMyAds').style.display = t === 'myads' ? 'block' : 'none';
-  document.getElementById('navHomeBtn').classList.toggle('active', t === 'home');
-  document.getElementById('navUserBtn').classList.toggle('active', t === 'myads');
-}
-
-function handleAnunciarClick() { 
-  if (!currentUser) { alert("Logue para anunciar."); loginGoogle(); } 
-  else { itemPhotos = []; renderPhotos('cad'); goStep(0); document.getElementById('cadOverlay').classList.add('open'); } 
-}
-function goStep(n) { document.querySelectorAll('.cad-step').forEach((s, i) => s.style.display = i === n ? 'block' : 'none'); }
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('open'); editingAdId = null; 
-  const u = new URL(window.location.href); u.searchParams.delete('ad'); window.history.pushState({}, '', u); 
-}
-
-window.onload = () => { setupCats(); updateWeather(); loadAll(); };
+// --- 🚀 START ---
+window.onload = () => { 
+  setupCats(); 
+  updateWeather(); 
+  updateFinance(); 
+};
 </script>
 </body>
 </html>
