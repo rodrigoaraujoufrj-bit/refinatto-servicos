@@ -60,10 +60,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .weather-status { font-size: 11px; font-weight: 600; color: var(--muted); }
 .rain-prob { font-size: 10px; font-weight: 700; color: #3498db; margin-top: 2px; }
 
-.finance-info { border-left: 1px solid var(--border); padding-left: 15px; flex: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+/* Ajuste de tipografia na grade financeira */
+.finance-info { border-left: 1px solid var(--border); padding-left: 15px; flex: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
 .finance-box { display: flex; flex-direction: column; text-align: right; }
-.finance-item { font-size: 12px; font-weight: 800; color: var(--gold); }
-.finance-label { font-size: 8px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+.finance-item { font-size: 14px; font-weight: 800; color: var(--gold); line-height: 1; } /* Fonte aumentada para 14px */
+.finance-label { font-size: 9px; color: var(--muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px; } /* Label mais forte */
 
 .search-container { padding: 0 20px; margin-top: -10px; margin-bottom: 10px; }
 .search-box { background: white; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -88,7 +89,6 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 .pcard-sub { font-size: 11px; color: var(--muted); }
 .pcard-thumb { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
 
-/* Modais e UI */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; display:none; padding:15px; overflow-y:auto; }
 .overlay.open { display:flex; align-items: flex-start; justify-content: center; }
 .modal-card { background:var(--paper); border-radius:28px; padding:24px; width: 100%; max-width: 410px; position: relative; margin: 20px 0; }
@@ -167,7 +167,7 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 </div>
 
 <script>
-// --- ⚙️ FINANCEIRO E CLIMA (ISOLADOS PARA NÃO TRAVAR) ---
+// --- ⚙️ FINANCEIRO E CLIMA (Otimizados) ---
 async function updateFinance() {
   try {
     const res = await fetch(`https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL,BTC-BRL`);
@@ -235,7 +235,7 @@ function filterData() {
   const term = document.getElementById('searchInput').value.toLowerCase();
   let list = currentData;
   if (activeCat) list = list.filter(i => i.categoria === activeCat);
-  if (term) list = list.filter(i => i.titulo.toLowerCase().includes(term));
+  if (term) list = list.filter(i => (i.titulo || "").toLowerCase().includes(term));
   renderFeed(list);
 }
 
@@ -252,7 +252,7 @@ function renderFeed(list) {
   `).join('');
 }
 
-// --- 🚀 START ---
+// --- 🚀 INICIALIZAÇÃO ---
 window.onload = () => { 
   setupCats(); 
   updateWeather(); 
