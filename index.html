@@ -79,8 +79,11 @@ body { background:var(--paper); font-family:'Plus Jakarta Sans',sans-serif; colo
 
 .plist { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
 .pcard { background:var(--card); border:1.5px solid var(--border); border-radius:20px; padding:12px; display:flex; align-items:center; gap:12px; cursor: pointer; }
+
+/* ✅ CSS DA FOTO DO ANUNCIANTE RECUPERADO */
 .pcard-avatar-wrapper { width: 42px; height: 42px; border-radius: 50%; background: var(--gold-pale); overflow: hidden; flex-shrink: 0; border: 1.5px solid var(--gold-light); }
 .pcard-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
 .pcard-body { flex:1; min-width:0; }
 .pcard-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color: var(--ink); }
 .pcard-sub { font-size: 11px; color: var(--muted); }
@@ -228,15 +231,17 @@ function filterData() {
   renderFeed(list);
 }
 
+// ✅ FUNÇÃO RENDERFEED COM FOTO DO GMAIL DO USUÁRIO
 function renderFeed(list) {
   const feed = document.getElementById('plist');
   feed.innerHTML = list.map(item => {
     const isUrgent = item.categoria === "Achados e Perdidos";
+    
+    // Puxa foto_url da relação usuarios(*)
     const uPhoto = isUrgent ? `https://ui-avatars.com/api/?name=%3F&background=E74C3C&color=FFF` : (item.usuarios?.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.usuarios?.nome || 'V')}&background=F0E0B8&color=B8862A`);
     const loc = isUrgent ? "Condomínio" : (item.usuarios?.tipo === 'morador' ? `B${item.usuarios.bloco}` : item.usuarios?.setor || 'Vizinho');
     const name = isUrgent ? "Anônimo" : (item.usuarios?.nome || 'Vizinho');
     
-    // ✅ ADICIONADO ONCLICK PARA ABRIR DETALHES
     return `<div class="pcard" onclick="verDetalhes('${item.id}')">
       <div class="pcard-avatar-wrapper"><img class="pcard-avatar-img" src="${uPhoto}" loading="lazy"></div>
       <div class="pcard-body">
@@ -248,7 +253,6 @@ function renderFeed(list) {
   }).join('');
 }
 
-// ✅ FUNÇÃO VER DETALHES (RECUPERADA)
 function verDetalhes(id) {
   const ad = currentData.find(a => a.id === id); if (!ad) return;
   const isUrgent = ad.categoria === "Achados e Perdidos";
@@ -273,8 +277,8 @@ function verDetalhes(id) {
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showTab(t) { /* Função simples para trocar abas se necessário */ }
-async function handleAnunciarClick() { /* Redireciona para o fluxo de anúncio */ alert('Faça login para anunciar!'); }
+function showTab(t) { /* Mantém lógica de abas */ }
+async function handleAnunciarClick() { alert('Faça login para anunciar!'); }
 
 async function loginGoogle() { await sb.auth.signInWithOAuth({ provider: 'google' }); }
 
